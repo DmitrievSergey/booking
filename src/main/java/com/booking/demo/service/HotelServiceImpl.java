@@ -1,5 +1,6 @@
 package com.booking.demo.service;
 
+import com.booking.demo.exception.EntityAlreadyExistsException;
 import com.booking.demo.exception.EntityNotFoundException;
 import com.booking.demo.model.Hotel;
 import com.booking.demo.repository.HotelRepository;
@@ -9,18 +10,36 @@ import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class HotelServiceImpl implements HotelService{
     private final HotelRepository hotelRepository;
     @Override
-    public Hotel save(Hotel hotel) {
+    public synchronized Hotel save(Hotel hotel) {
+        Optional<Hotel> findingHotel = hotelRepository.findByNameAndAddressAndTown(
+                hotel.getName(),
+                hotel.getAddress(),
+                hotel.getTown()
+        );
+        if(findingHotel.isPresent()) throw new EntityAlreadyExistsException(
+                MessageFormat.format(Strings.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
+        );
         return hotelRepository.saveAndFlush(hotel);
     }
 
     @Override
-    public Hotel update(Hotel updatingHotel) {
+    public synchronized Hotel update(Hotel updatingHotel) {
+        Optional<Hotel> findingHotel = hotelRepository.findByNameAndAddressAndTown(
+                updatingHotel.getName(),
+                updatingHotel.getAddress(),
+                updatingHotel.getTown()
+        );
+        if(findingHotel.isPresent()
+                && !updatingHotel.getId().equals(findingHotel.get().getId())) throw new EntityAlreadyExistsException(
+                MessageFormat.format(Strings.ENTITY_ALREADY_EXISTS, "Отель", updatingHotel.getName())
+        );
         Hotel hotel = findHotelById(updatingHotel.getId());
         hotel.setAddress(updatingHotel.getAddress());
         hotel.setName(updatingHotel.getName());

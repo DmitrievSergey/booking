@@ -1,11 +1,14 @@
 package com.booking.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @Entity
@@ -13,19 +16,31 @@ import lombok.NoArgsConstructor;
 public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    private String id;
 
-    String name;
+    private String name;
 
-    String title;
+    private String title;
 
-    String town;
+    private String town;
 
-    String address;
+    private String address;
 
-    String distance;
+    private String distance;
 
-    Float rating = 0.0f;
+    private Float rating = 0.0f;
 
-    Long gradeCount = 0L;
+    private Long gradeCount = 0L;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "hotel")
+    @MapKey(name = "number")
+    private Map<String,Room> roomMap = new HashMap<>();
+
+    public void addRoom(Room room) {
+        roomMap.put(room.getNumber(), room);
+    }
+
+    public void deleteRoom(Room room) {
+        roomMap.remove(room.getNumber());
+    }
 }

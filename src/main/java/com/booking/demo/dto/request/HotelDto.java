@@ -14,20 +14,20 @@ import lombok.Setter;
 public class HotelDto {
     @NotNull
     @Size(min = 3, max = 50, message = "Наименование отеля не должно быть меньше {min} символов и не должно быть больше {max} символов")
-    String name;
+    private String name;
 
     @NotNull
     @Size(min = 10, max = 50, message = "Заголовок отеля не должен быть меньше {min} символов и не должен быть больше {max} символов")
-    String title;
+    private String title;
 
     @NotNull
     @Size(min = 3, max = 50, message = "Название города не должно быть меньше {min} символов и не должно быть больше {max} символов")
-    String town;
+    private String town;
 
     @NotNull
     @Size(min = 3, max = 50, message = "Адрес отеля не должен быть меньше {min} символов и не должен быть больше {max} символов")
-    String address;
+    private String address;
 
-    String distance;
+    private String distance;
 
 }

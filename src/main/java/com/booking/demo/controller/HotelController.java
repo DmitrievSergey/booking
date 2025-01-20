@@ -1,6 +1,7 @@
 package com.booking.demo.controller;
 
 import com.booking.demo.dto.request.HotelDto;
+import com.booking.demo.dto.response.ResponseFindHotelById;
 import com.booking.demo.dto.response.ResponseHotelDto;
 import com.booking.demo.mapper.HotelMapper;
 import com.booking.demo.model.Hotel;
@@ -40,9 +41,9 @@ public class HotelController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<ResponseHotelDto> getHotelById(@PathVariable(name = "id") String hotelId) {
+    ResponseEntity<ResponseFindHotelById> getHotelById(@PathVariable(name = "id") String hotelId) {
 
-        return ResponseEntity.ok(hotelMapper.mapToResponse(hotelService.findHotelById(hotelId)));
+        return ResponseEntity.ok(hotelMapper.mapToResponseWithRooms(hotelService.findHotelById(hotelId)));
     }
 
     @GetMapping()
