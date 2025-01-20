@@ -1,6 +1,7 @@
 package com.booking.demo.mapper;
 
 import com.booking.demo.dto.request.HotelDto;
+import com.booking.demo.dto.response.ResponseFindHotelById;
 import com.booking.demo.dto.response.ResponseHotelDto;
 import com.booking.demo.model.Hotel;
 import org.mapstruct.InheritInverseConfiguration;
@@ -17,4 +18,6 @@ public interface HotelMapper {
     Hotel map(String hotelId, HotelDto hotelDto);
 
     ResponseHotelDto mapToResponse(Hotel hotel);
+
+    ResponseFindHotelById mapToResponseWithRooms(Hotel hotel);
 }
