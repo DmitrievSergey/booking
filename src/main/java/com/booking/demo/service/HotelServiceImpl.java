@@ -70,4 +70,17 @@ public class HotelServiceImpl implements HotelService{
     public void deleteHotelById(String hotelId) {
         hotelRepository.deleteById(hotelId);
     }
+
+    @Override
+    public synchronized Hotel rateHotel(int rate, String hotelId) {
+        Hotel hotel = findHotelById(hotelId);
+        float rating = hotel.getRating();
+        int numberOfRating = hotel.getNumberOfRating();
+        int totalRating = (int) (numberOfRating * rating) + rate;
+        numberOfRating += 1;
+        hotel.setNumberOfRating(numberOfRating);
+        hotel.setRating((float)totalRating/numberOfRating);
+
+        return hotelRepository.saveAndFlush(hotel);
+    }
 }

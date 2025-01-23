@@ -15,4 +15,6 @@ public interface HotelService {
 
     void deleteHotelById(String hotelId);
 
+    Hotel rateHotel(int rate, String hotelId);
+
 }

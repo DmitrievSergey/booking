@@ -19,7 +19,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private String name;
+    private String userName;
 
     private String password;
 
@@ -28,7 +28,7 @@ public class User {
     @ToString.Exclude
     @Type(StringArrayType.class)
     @Column(name = "roles", columnDefinition = "text[]")
-    private String[] roles = new String[] {RoleType.ROLE_USER.toString()};
+    private String[] roles = new String[1];
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<ReservationInterval> reservationList;

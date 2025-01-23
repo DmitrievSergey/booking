@@ -30,7 +30,7 @@ public class Hotel {
 
     private Float rating = 0.0f;
 
-    private Long gradeCount = 0L;
+    private int numberOfRating;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "hotel")
     @MapKey(name = "number")
