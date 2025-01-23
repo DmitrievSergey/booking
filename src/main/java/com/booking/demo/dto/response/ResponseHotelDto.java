@@ -12,5 +12,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResponseHotelDto extends HotelDto {
     private Float rating;
-    private Long gradeCount;
+    private int numberOfRating;
 }
