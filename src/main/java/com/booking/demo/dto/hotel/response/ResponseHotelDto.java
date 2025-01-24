@@ -1,6 +1,6 @@
-package com.booking.demo.dto.response;
+package com.booking.demo.dto.hotel.response;
 
-import com.booking.demo.dto.request.HotelDto;
+import com.booking.demo.dto.hotel.request.HotelDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

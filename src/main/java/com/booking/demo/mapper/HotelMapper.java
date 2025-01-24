@@ -1,8 +1,8 @@
 package com.booking.demo.mapper;
 
-import com.booking.demo.dto.request.HotelDto;
-import com.booking.demo.dto.response.ResponseFindHotelById;
-import com.booking.demo.dto.response.ResponseHotelDto;
+import com.booking.demo.dto.hotel.request.HotelDto;
+import com.booking.demo.dto.hotel.response.ResponseFindHotelById;
+import com.booking.demo.dto.hotel.response.ResponseHotelDto;
 import com.booking.demo.model.Hotel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;

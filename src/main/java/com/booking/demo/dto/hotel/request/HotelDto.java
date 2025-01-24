@@ -1,4 +1,4 @@
-package com.booking.demo.dto.request;
+package com.booking.demo.dto.hotel.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
