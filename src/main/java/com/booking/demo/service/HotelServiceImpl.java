@@ -1,11 +1,14 @@
 package com.booking.demo.service;
 
+import com.booking.demo.dto.filter.HotelFilter;
 import com.booking.demo.exception.EntityAlreadyExistsException;
 import com.booking.demo.exception.EntityNotFoundException;
 import com.booking.demo.model.Hotel;
 import com.booking.demo.repository.HotelRepository;
+import com.booking.demo.repository.HotelSpecification;
 import com.booking.demo.utils.Strings;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -82,5 +85,14 @@ public class HotelServiceImpl implements HotelService{
         hotel.setRating((float)totalRating/numberOfRating);
 
         return hotelRepository.saveAndFlush(hotel);
+    }
+
+    @Override
+    public List<Hotel> filterBy(HotelFilter filter) {
+        return hotelRepository.findAll(HotelSpecification.withFilter(filter)
+                , PageRequest.of(
+                        filter.getPageNumber(),
+                        filter.getPageSize()
+                )).getContent();
     }
 }

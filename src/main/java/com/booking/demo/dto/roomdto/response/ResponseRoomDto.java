@@ -1,10 +1,6 @@
 package com.booking.demo.dto.roomdto.response;
 
-import com.booking.demo.dto.response.ResponseHotelDto;
-import com.booking.demo.model.Hotel;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.booking.demo.dto.hotel.response.ResponseHotelDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,8 +1,9 @@
 package com.booking.demo.controller;
 
-import com.booking.demo.dto.request.HotelDto;
-import com.booking.demo.dto.response.ResponseFindHotelById;
-import com.booking.demo.dto.response.ResponseHotelDto;
+import com.booking.demo.dto.filter.HotelFilter;
+import com.booking.demo.dto.hotel.request.HotelDto;
+import com.booking.demo.dto.hotel.response.ResponseFindHotelById;
+import com.booking.demo.dto.hotel.response.ResponseHotelDto;
 import com.booking.demo.mapper.HotelMapper;
 import com.booking.demo.model.Hotel;
 import com.booking.demo.service.HotelService;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/hotel")
 @RequiredArgsConstructor
@@ -72,5 +75,14 @@ public class HotelController {
                                                        int rate) {
         Hotel ratedHotel = hotelService.rateHotel(rate, hotelId);
         return ResponseEntity.ok(hotelMapper.mapToResponse(ratedHotel));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<ResponseHotelDto>> findBy(@Valid HotelFilter hotelFilter) {
+        log.info(" Filter by name {}", hotelFilter.getName());
+        log.info(" Filter address {}", hotelFilter.getAddress());
+        return ResponseEntity.ok(
+                hotelService.filterBy(hotelFilter).stream().map(hotelMapper::mapToResponse).toList()
+        );
     }
 }

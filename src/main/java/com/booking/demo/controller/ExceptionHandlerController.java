@@ -1,6 +1,6 @@
 package com.booking.demo.controller;
 
-import com.booking.demo.dto.response.ErrorResponse;
+import com.booking.demo.dto.hotel.response.ErrorResponse;
 import com.booking.demo.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 @Slf4j

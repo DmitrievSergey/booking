@@ -1,0 +1,393 @@
+{
+	"info": {
+		"_postman_id": "e5da50f9-63f2-47d1-836a-380df0ea1c9e",
+		"name": "Booking",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15499505"
+	},
+	"item": [
+		{
+			"name": "Hotel",
+			"item": [
+				{
+					"name": "add hotel with correct data",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "Admin",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "Sergeev",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"hotel1\",\n    \"title\": \"the best hotel1\",\n    \"town\": \"Moscow\",\n    \"address\": \"Tverskaja street 2\",\n    \"distance\": \"9.2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/hotel/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hotel",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add hotel with empty name",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"\",\n    \"title\": \"the best hotel2\",\n    \"town\": \"Mosqow\",\n    \"address\": \"Tverskaja street 2\",\n    \"distance\": \"9.2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/hotel/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hotel",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update hotel",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "Admin2",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "Sergeev",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"hotel2\",\n    \"title\": \"the best hotel2 updated\",\n    \"town\": \"Moscow\",\n    \"address\": \"Tverskaja street 2 updated\",\n    \"distance\": \"10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/hotel/7be7744f-5b2c-4788-9e11-b22b885c6d72",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hotel",
+								"7be7744f-5b2c-4788-9e11-b22b885c6d72"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get hotel by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/hotel/6ad53238-5edf-4a06-a74a-b94118c8493b",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hotel",
+								"6ad53238-5edf-4a06-a74a-b94118c8493b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all hotels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/hotel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hotel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete hotel",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/hotel/7dc41b32-eafc-4ab0-a3e0-fd0b37308108",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hotel",
+								"7dc41b32-eafc-4ab0-a3e0-fd0b37308108"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rate hotel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/hotel/rate/fe90c279-f9f8-4601-b001-dbb1ee1be17b?rate=5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hotel",
+								"rate",
+								"fe90c279-f9f8-4601-b001-dbb1ee1be17b"
+							],
+							"query": [
+								{
+									"key": "rate",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/hotel/filter?name=hotel&pageSize=1&pageNumber=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hotel",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "hotel"
+								},
+								{
+									"key": "pageSize",
+									"value": "1"
+								},
+								{
+									"key": "pageNumber",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Room",
+			"item": [
+				{
+					"name": "add room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"first room\",\n    \"description\": \"first description room\",\n    \"number\": \"1\",\n    \"pricePerDay\": 1000.0,\n    \"peopleCount\": 1,\n    \"hotel\": {\n        \"id\": \"164684d6-5607-49d1-955e-327fb9c9915e\",\n        \"name\": \"hotel2\",\n        \"title\": \"the best hotel2\",\n        \"town\": \"Mosqow\",\n        \"address\": \"Tverskaja street 2\",\n        \"distance\": \"9.2\",\n        \"rating\": 0.0,\n        \"gradeCount\": 0\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/room/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"room",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change room",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"first room updated\",\n    \"description\": \"first description room updated\",\n    \"number\": \"1\",\n    \"pricePerDay\": 1000.0,\n    \"peopleCount\": 1,\n    \"hotel\": {\n        \"id\": \"164684d6-5607-49d1-955e-327fb9c9915e\",\n        \"name\": \"hotel2\",\n        \"title\": \"the best hotel2\",\n        \"town\": \"Mosqow\",\n        \"address\": \"Tverskaja street 2\",\n        \"distance\": \"9.2\",\n        \"rating\": 0.0,\n        \"gradeCount\": 0\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/room/44fd98ff-ad44-408a-a7e7-a3e47b5e1620",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"room",
+								"44fd98ff-ad44-408a-a7e7-a3e47b5e1620"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "add user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"Aleks\",\n    \"password\":\"Sergeev\",\n    \"email\":\"sergei2003@bk.ru\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/user/add?role=ROLE_USER",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"add"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "ROLE_USER"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/user/add?role=ROLE_ADMIN",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"add"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "ROLE_ADMIN"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
