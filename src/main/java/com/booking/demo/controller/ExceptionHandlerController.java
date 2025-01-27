@@ -28,6 +28,13 @@ public class ExceptionHandlerController {
                 .body(new ErrorResponse(Objects.requireNonNull(exception.getFieldError()).getDefaultMessage()));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> notFound(IllegalArgumentException exception) {
+        log.error("Ошибка при валидации входных параметров {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(Objects.requireNonNull(exception.getLocalizedMessage())));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> exception(Exception exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

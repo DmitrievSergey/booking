@@ -20,14 +20,15 @@ public interface HotelSpecification {
     static Specification<Hotel> byHotelNumberOfRating(Integer numberOfRating) {
         return (root, query, criteriaBuilder) -> {
             if(numberOfRating == null) return null;
-            return criteriaBuilder.equal(root.get("numberOfRating"), numberOfRating);
+            return criteriaBuilder.greaterThanOrEqualTo(root.get("numberOfRating"), numberOfRating);
         };
     }
 
     static Specification<Hotel> byHotelRating(Float rating) {
         return (root, query, criteriaBuilder) -> {
             if(rating == null) return null;
-            return criteriaBuilder.equal(root.get("rating"), rating);
+
+            return criteriaBuilder.greaterThanOrEqualTo(root.get("rating"), rating);
         };
     }
 
