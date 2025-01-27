@@ -25,5 +25,5 @@ public class HotelFilter {
 
     private Float rating = 0.0f;
 
-    private int numberOfRating;
+    private Integer numberOfRating;
 }

@@ -6,8 +6,9 @@ import com.booking.demo.exception.EntityNotFoundException;
 import com.booking.demo.model.Hotel;
 import com.booking.demo.repository.HotelRepository;
 import com.booking.demo.repository.HotelSpecification;
-import com.booking.demo.utils.Strings;
+import com.booking.demo.utils.AppMessages;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HotelServiceImpl implements HotelService{
@@ -27,7 +29,7 @@ public class HotelServiceImpl implements HotelService{
                 hotel.getTown()
         );
         if(findingHotel.isPresent()) throw new EntityAlreadyExistsException(
-                MessageFormat.format(Strings.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
+                MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
         );
         return hotelRepository.saveAndFlush(hotel);
     }
@@ -41,7 +43,7 @@ public class HotelServiceImpl implements HotelService{
         );
         if(findingHotel.isPresent()
                 && !updatingHotel.getId().equals(findingHotel.get().getId())) throw new EntityAlreadyExistsException(
-                MessageFormat.format(Strings.ENTITY_ALREADY_EXISTS, "Отель", updatingHotel.getName())
+                MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", updatingHotel.getName())
         );
         Hotel hotel = findHotelById(updatingHotel.getId());
         hotel.setAddress(updatingHotel.getAddress());
@@ -58,7 +60,7 @@ public class HotelServiceImpl implements HotelService{
         return hotelRepository.findById(hotelId)
                 .orElseThrow(() -> {
                             throw new EntityNotFoundException(
-                                    MessageFormat.format(Strings.ENTITY_NOT_EXISTS, "Отель", hotelId)
+                                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Отель", hotelId)
                             );
                         }
                 );
@@ -89,10 +91,12 @@ public class HotelServiceImpl implements HotelService{
 
     @Override
     public List<Hotel> filterBy(HotelFilter filter) {
-        return hotelRepository.findAll(HotelSpecification.withFilter(filter)
+        List<Hotel> hotelList = hotelRepository.findAll(HotelSpecification.withFilter(filter)
                 , PageRequest.of(
                         filter.getPageNumber(),
                         filter.getPageSize()
                 )).getContent();
+        log.info("Hotel list {}", hotelList);
+        return hotelList;
     }
 }

@@ -10,7 +10,6 @@ import java.util.Optional;
 public interface HotelRepository extends JpaRepository<Hotel, String>, JpaSpecificationExecutor<Hotel>
         , PagingAndSortingRepository<Hotel, String> {
 
-
     Optional<Hotel> findByNameAndAddressAndTown(String hotelName, String hotelAddress
     , String hotelTown);
 }

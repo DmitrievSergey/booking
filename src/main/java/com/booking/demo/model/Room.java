@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,5 +32,9 @@ public class Room {
     private Hotel hotel;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "room")
-    private List<ReservationInterval> intervalList;
+    private List<ReservationInterval> intervalList = new ArrayList<>();
+
+    public void addInterval(ReservationInterval interval) {
+        intervalList.add(interval);
+    }
 }

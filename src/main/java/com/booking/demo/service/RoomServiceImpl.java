@@ -1,16 +1,20 @@
 package com.booking.demo.service;
 
+import com.booking.demo.dto.filter.RoomFilter;
 import com.booking.demo.exception.EntityAlreadyExistsException;
 import com.booking.demo.exception.EntityNotFoundException;
-import com.booking.demo.model.Hotel;
 import com.booking.demo.model.Room;
+import com.booking.demo.repository.HotelRepository;
 import com.booking.demo.repository.RoomRepository;
-import com.booking.demo.utils.Strings;
+import com.booking.demo.repository.RoomSpecification;
+import com.booking.demo.utils.AppMessages;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -18,14 +22,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService{
     private final RoomRepository roomRepository;
+    private final HotelRepository hotelRepository;
 
     @Override
     public synchronized Room save(Room room) {
-        Optional<Room> creatingRoom = roomRepository.findByNumberAndHotel(room.getNumber(),
+        //TODO: добавить проверку на отель
+
+        Optional<Room> creatingRoom = roomRepository.findByNumberAndHotel(
+                room.getNumber(),
                 room.getHotel());
         if(creatingRoom.isPresent()) throw new EntityAlreadyExistsException(
-                MessageFormat.format(Strings.ENTITY_ALREADY_EXISTS, "Комната", room.getNumber())
+                MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Комната", room.getNumber())
         );
+
         Room newRoom = roomRepository.saveAndFlush(room);
         newRoom.getHotel().addRoom(room);
         return newRoom;
@@ -40,7 +49,7 @@ public class RoomServiceImpl implements RoomService{
 
         if(findingRoom.isPresent()
                 && !roomId.equals(findingRoom.get().getId())) throw new EntityAlreadyExistsException(
-                MessageFormat.format(Strings.ENTITY_ALREADY_EXISTS, "Отель", room.getNumber())
+                MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", room.getNumber())
         );
         Room updatingRoom = findRoomById(roomId);
         updatingRoom.setName(room.getName());
@@ -57,7 +66,7 @@ public class RoomServiceImpl implements RoomService{
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> {
                             throw new EntityNotFoundException(
-                                    MessageFormat.format(Strings.ENTITY_NOT_EXISTS, "Комната", roomId)
+                                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Комната", roomId)
                             );
                         }
                 );
@@ -66,5 +75,15 @@ public class RoomServiceImpl implements RoomService{
     @Override
     public void deleteRoomById(String roomId) {
         roomRepository.deleteById(roomId);
+    }
+
+    @Override
+    public List<Room> filterBy(RoomFilter filter) {
+        List<Room> roomList = roomRepository.findAll(RoomSpecification.withFilter(filter)
+                , PageRequest.of(
+                        filter.getPageNumber(),
+                        filter.getPageSize()
+                )).getContent();
+        return roomList;
     }
 }

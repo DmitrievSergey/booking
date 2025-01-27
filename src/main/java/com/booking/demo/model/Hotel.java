@@ -29,7 +29,7 @@ public class Hotel {
     private String distance;
 
     private Float rating = 0.0f;
-
+    @Column(name = "number_of_rating")
     private int numberOfRating;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "hotel")
