@@ -191,10 +191,25 @@
 				{
 					"name": "rate hotel",
 					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "Admin",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "Sergeev",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/hotel/rate/fe90c279-f9f8-4601-b001-dbb1ee1be17b?rate=5",
+							"raw": "{{baseUrl}}/api/v1/hotel/rate/3ce61adf-fef3-46f3-935a-84104a8d2e2c?rate=5",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -203,7 +218,7 @@
 								"v1",
 								"hotel",
 								"rate",
-								"fe90c279-f9f8-4601-b001-dbb1ee1be17b"
+								"3ce61adf-fef3-46f3-935a-84104a8d2e2c"
 							],
 							"query": [
 								{
@@ -221,7 +236,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/hotel/filter?name=hotel&pageSize=1&pageNumber=0",
+							"raw": "{{baseUrl}}/api/v1/hotel/filter?pageSize=3&pageNumber=0&rating=2&numberOfRating=1",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -233,16 +248,20 @@
 							],
 							"query": [
 								{
-									"key": "name",
-									"value": "hotel"
-								},
-								{
 									"key": "pageSize",
-									"value": "1"
+									"value": "3"
 								},
 								{
 									"key": "pageNumber",
 									"value": "0"
+								},
+								{
+									"key": "rating",
+									"value": "2"
+								},
+								{
+									"key": "numberOfRating",
+									"value": "1"
 								}
 							]
 						}
@@ -257,11 +276,26 @@
 				{
 					"name": "add room",
 					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "Admin",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "Sergeev",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"first room\",\n    \"description\": \"first description room\",\n    \"number\": \"1\",\n    \"pricePerDay\": 1000.0,\n    \"peopleCount\": 1,\n    \"hotel\": {\n        \"id\": \"164684d6-5607-49d1-955e-327fb9c9915e\",\n        \"name\": \"hotel2\",\n        \"title\": \"the best hotel2\",\n        \"town\": \"Mosqow\",\n        \"address\": \"Tverskaja street 2\",\n        \"distance\": \"9.2\",\n        \"rating\": 0.0,\n        \"gradeCount\": 0\n    }\n}",
+							"raw": "{\n    \"name\": \"first room\",\n    \"description\": \"first description room\",\n    \"number\": \"1\",\n    \"pricePerDay\": 1000.0,\n    \"peopleCount\": 1,\n    \"hotel\": {\n        \"id\": \"3ce61adf-fef3-46f3-935a-84104a8d2e2c\",\n        \"name\": \"hotel2\",\n        \"title\": \"the best hotel2\",\n        \"town\": \"Mosqow\",\n        \"address\": \"Tverskaja street 2\",\n        \"distance\": \"9.2\",\n        \"rating\": 0.0,\n        \"gradeCount\": 0\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -307,6 +341,36 @@
 								"v1",
 								"room",
 								"44fd98ff-ad44-408a-a7e7-a3e47b5e1620"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/room/filter?pageSize=3&pageNumber=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"room",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "3"
+								},
+								{
+									"key": "pageNumber",
+									"value": "0"
+								}
 							]
 						}
 					},
@@ -382,6 +446,55 @@
 									"key": "role",
 									"value": "ROLE_ADMIN"
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reservation",
+			"item": [
+				{
+					"name": "add reservation",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "Admin",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "Sergeev",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"startDate\": \"23.03.1977\",\n    \"endDate\": \"24.03.1977\",\n    \"room\": {\n            \"name\": \"first room\",\n    \"description\": \"first description room\",\n    \"number\": \"1\",\n    \"pricePerDay\": 1000.0,\n    \"peopleCount\": 1\n    }\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reservation/2fd07fd1-ad37-4a0d-9250-ad1deba26fc2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reservation",
+								"2fd07fd1-ad37-4a0d-9250-ad1deba26fc2"
 							]
 						}
 					},
