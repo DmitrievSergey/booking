@@ -11,7 +11,7 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
-  booking:
+  booking-service:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile

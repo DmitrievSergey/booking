@@ -7,6 +7,6 @@ FROM openjdk:17-oracle
 
 WORKDIR /app
 #COPY --from=builder /app /app
-COPY ../build/libs/booking.jar booking.jar
+COPY ../booking-service/build/libs/booking-service.jar booking-service.jar
 
-ENTRYPOINT ["java", "-jar", "booking.jar"]
+ENTRYPOINT ["java", "-jar", "booking-service.jar"]
