@@ -7,3 +7,13 @@ spring:
     password: postgres
     hikari:
       schema: booking_schema
+  kafka:
+    bootstrap-servers: localhost:9092
+
+app:
+  kafka:
+    userRegistration: "user-registration-topic"
+    roomReservation: "room-reservation-topic"
+    kafkaMessageGroupId: "reservation-group-id"
+server:
+  port: 8080

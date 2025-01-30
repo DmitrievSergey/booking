@@ -17,7 +17,7 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     public ReservationInterval save(ReservationInterval reservationInterval) {
-        return reservationRepository.saveAndFlush(reservationInterval);
+        return reservationRepository.save(reservationInterval);
     }
 
     @Override

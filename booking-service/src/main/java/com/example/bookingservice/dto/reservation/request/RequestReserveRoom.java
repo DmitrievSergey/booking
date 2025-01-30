@@ -22,7 +22,7 @@ public class RequestReserveRoom {
     @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate endDate;
 
-    @NotNull
-    private Room room;
+//    @NotNull
+//    private Room room;
 
 }
