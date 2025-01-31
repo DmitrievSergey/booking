@@ -1,6 +1,8 @@
 package com.example.bookingservice.dto.reservation.response;
 
 
+import com.example.bookingservice.dto.roomdto.response.ResponseRoomDto;
+import com.example.bookingservice.dto.user.response.ResponseUser;
 import com.example.bookingservice.model.Room;
 import com.example.bookingservice.model.User;
 import lombok.AllArgsConstructor;
@@ -20,7 +22,7 @@ public class ResponseReservation {
 
     private LocalDate endDate;
 
-    private Room room;
+    private ResponseRoomDto room;
 
-    private User user;
+    private ResponseUser user;
 }

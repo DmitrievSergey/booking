@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseHotelDto extends HotelDto {
+    private String id;
     private Float rating;
     private int numberOfRating;
 }

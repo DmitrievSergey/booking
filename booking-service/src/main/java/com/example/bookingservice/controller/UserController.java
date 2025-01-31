@@ -2,6 +2,7 @@ package com.example.bookingservice.controller;
 
 import com.example.basedomain.UserRegistration;
 import com.example.basedomain.UserRegistrationEvent;
+import com.example.bookingservice.aop.SendEvent;
 import com.example.bookingservice.dto.user.request.RequestCreateUser;
 import com.example.bookingservice.dto.user.response.ResponseUser;
 import com.example.bookingservice.mapper.UserMapper;
@@ -23,16 +24,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserMapper userMapper;
     private final UserService userService;
-    private final KafkaMessagePublisher kafkaMessagePublisher;
 
+
+    @SendEvent
     @PostMapping("/add")
     ResponseEntity<ResponseUser> createUser(@RequestParam RoleType role,
                                             @Valid @RequestBody RequestCreateUser user) {
         User newUser = userMapper.mapToEntity(user, role);
-        UserRegistrationEvent event = new UserRegistrationEvent();
-        event.setUserRegistration(new UserRegistration(newUser.getId()));
-        kafkaMessagePublisher.sendUserRegistrationEvent(event);
-        log.info("Message sent to kafka");
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                      userMapper.mapToResponse(userService.save(newUser))

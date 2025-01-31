@@ -3,6 +3,7 @@ package com.example.bookingservice.controller;
 
 import com.example.basedomain.RoomReservation;
 import com.example.basedomain.RoomReservationEvent;
+import com.example.bookingservice.aop.SendEvent;
 import com.example.bookingservice.dto.reservation.request.RequestReserveRoom;
 import com.example.bookingservice.dto.reservation.response.ResponseReservation;
 import com.example.bookingservice.mapper.ReservationMapper;
@@ -35,7 +36,7 @@ public class ReservationController {
     private final RoomService roomService;
     private final KafkaMessagePublisher kafkaMessagePublisher;
 
-
+    @SendEvent
     @PostMapping("/{roomId}")
     ResponseEntity<ResponseReservation> reserveRoom(@PathVariable() String roomId
             , @RequestBody RequestReserveRoom reservation
@@ -47,14 +48,6 @@ public class ReservationController {
                 reservation,
                 opUser
         );
-        //log.info("Reservation Interval {}",reservationInterval.toString());
-        RoomReservationEvent event = new RoomReservationEvent();
-        event.setRoomReservation(new RoomReservation(
-                opUser.getId(),
-                roomId,
-                reservation.getStartDate()
-                , reservation.getEndDate()));
-        kafkaMessagePublisher.sendRoomReservationEvent(event);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         reservationMapper.mapToResponse(reservationService.save(reservationInterval))

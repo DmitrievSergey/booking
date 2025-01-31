@@ -1,12 +1,7 @@
 spring:
-  jpa:
-    generate-ddl: true
-  datasource:
-    url: jdbc:postgresql://${HOST:localhost}/booking_db
-    username: postgres
-    password: postgres
-    hikari:
-      schema: booking_schema
+  data:
+    mongodb:
+      uri: mongodb://user:test@${HOST:localhost}:27017/statisticdb
   kafka:
     bootstrap-servers: PLAINTEXT://broker:9092
 
@@ -16,4 +11,4 @@ app:
     roomReservation: "room-reservation-topic"
     kafkaMessageGroupId: "reservation-group-id"
 server:
-  port: 8080
+  port: 8081

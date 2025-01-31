@@ -1,3 +1,13 @@
 #!/bin/sh
-export DOCKERHOST=$(ifconfig | grep -E "([0-9]{1,3}\.){3}[0-9]{1,3}" | grep -v 127.0.0.1 | awk '{ print $2 }' | cut -f2 -d: | head -n1)
-docker compose -f docker-compose.yml up
+docker compose down
+docker image prune -a -f
+docker volume prune -f
+docker buildx prune -f
+cd ..
+gradle :base-domain:clean
+gradle :booking-service:clean
+gradle :booking-service:bootJar
+gradle :statistic-service:clean
+gradle :statistic-service:bootJar
+cd docker
+docker compose -f docker-compose.yml up -d

@@ -1,3 +1,4 @@
 rootProject.name = 'booking'
 include("booking-service")
 include("base-domain")
+include("statistic-service")
