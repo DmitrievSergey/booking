@@ -1,0 +1,15 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://user:test@${HOST:localhost}:27017/statisticdb
+  kafka:
+    bootstrap-servers: PLAINTEXT://broker:9092
+
+app:
+  kafka:
+    enable: true
+    userRegistration: "user-registration-topic"
+    roomReservation: "room-reservation-topic"
+    kafkaMessageGroupId: "reservation-group-id"
+server:
+  port: 8081
