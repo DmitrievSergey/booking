@@ -17,7 +17,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    //TODO: добавить проверку на то, что пользователь с таким именем уже существует
     @Override
     public User save(User user) {
         Optional<User> newUser = userRepository.findByEmailAndUserName(user.getEmail(), user.getUserName());

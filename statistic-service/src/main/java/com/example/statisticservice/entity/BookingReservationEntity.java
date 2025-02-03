@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "booking_reservations")
@@ -26,5 +25,17 @@ public class BookingReservationEntity {
         this.roomId = roomId;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(id).append('|');
+        sb.append(userId).append('|');
+        sb.append(roomId).append('|');
+        sb.append(startDate).append('|');
+        sb.append(endDate);
+        sb.append("\n");
+        return sb.toString();
     }
 }

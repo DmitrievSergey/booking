@@ -24,4 +24,6 @@ public class ReservationServiceImpl implements ReservationService{
     public List<ReservationInterval> findAllReservations() {
         return reservationRepository.findAll();
     }
+
+    //TODO: добавить проверку на то, что такая комната в этом отеле уже зарезервирована на эти даты
 }

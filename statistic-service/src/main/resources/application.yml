@@ -7,6 +7,7 @@ spring:
 
 app:
   kafka:
+    enable: true
     userRegistration: "user-registration-topic"
     roomReservation: "room-reservation-topic"
     kafkaMessageGroupId: "reservation-group-id"

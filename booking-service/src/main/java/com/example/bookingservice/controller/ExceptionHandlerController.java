@@ -1,6 +1,7 @@
 package com.example.bookingservice.controller;
 
 import com.example.bookingservice.dto.hotel.response.ErrorResponse;
+import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,12 @@ import java.util.Objects;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionHandlerController {
+    @ExceptionHandler(EntityAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> notFound(EntityAlreadyExistsException exception) {
+        log.error("Ошибка при получении сущности {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(exception.getLocalizedMessage()));
+    }
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> notFound(EntityNotFoundException exception) {
         log.error("Ошибка при получении сущности {}", exception.getMessage());

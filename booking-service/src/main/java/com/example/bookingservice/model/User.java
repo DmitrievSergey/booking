@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = @Index(columnList = "userName"))
 @NoArgsConstructor
 public class User {
     @Id

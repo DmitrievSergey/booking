@@ -27,6 +27,7 @@ public class RoomServiceImpl implements RoomService{
     @Override
     public synchronized Room save(Room room) {
         //TODO: добавить проверку на отель
+        //TODO: вместо synchronized reentrantlock
 
         Optional<Room> creatingRoom = roomRepository.findByNumberAndHotel(
                 room.getNumber(),

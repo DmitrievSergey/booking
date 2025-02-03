@@ -16,23 +16,20 @@ import org.springframework.stereotype.Service;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class HotelServiceImpl implements HotelService{
+public class HotelServiceImpl implements HotelService {
+    ReentrantLock lock = new ReentrantLock();
     private final HotelRepository hotelRepository;
+
+    //TODO: вместо synchronized reentrantlock
     @Override
-    public synchronized Hotel save(Hotel hotel) {
-        Optional<Hotel> findingHotel = hotelRepository.findByNameAndAddressAndTown(
-                hotel.getName(),
-                hotel.getAddress(),
-                hotel.getTown()
-        );
-        if(findingHotel.isPresent()) throw new EntityAlreadyExistsException(
-                MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
-        );
-        return hotelRepository.saveAndFlush(hotel);
+    public Hotel save(Hotel hotel) {
+
+        return checkAndSave(hotel);
     }
 
     @Override
@@ -42,7 +39,7 @@ public class HotelServiceImpl implements HotelService{
                 updatingHotel.getAddress(),
                 updatingHotel.getTown()
         );
-        if(findingHotel.isPresent()
+        if (findingHotel.isPresent()
                 && !updatingHotel.getId().equals(findingHotel.get().getId())) throw new EntityAlreadyExistsException(
                 MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", updatingHotel.getName())
         );
@@ -85,7 +82,7 @@ public class HotelServiceImpl implements HotelService{
         int totalRating = (int) (numberOfRating * rating) + rate;
         numberOfRating += 1;
         hotel.setNumberOfRating(numberOfRating);
-        hotel.setRating((float)totalRating/numberOfRating);
+        hotel.setRating((float) totalRating / numberOfRating);
 
         return hotelRepository.saveAndFlush(hotel);
     }
@@ -99,5 +96,20 @@ public class HotelServiceImpl implements HotelService{
                 )).getContent();
         log.info("Hotel list {}", hotelList);
         return hotelList;
+    }
+
+    private Hotel checkAndSave(Hotel hotel) {
+        lock.lock();
+        if (hotelRepository.findByNameAndAddressAndTown(
+                hotel.getName(),
+                hotel.getAddress(),
+                hotel.getTown()).orElse(null) != null)
+            throw new EntityAlreadyExistsException(
+                    MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
+            );
+
+        Hotel savedHotel = hotelRepository.saveAndFlush(hotel);
+        lock.unlock();
+        return savedHotel;
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@ConditionalOnProperty(prefix = "app.kafka", name = "enable", havingValue = "true")
 public class KafkaConfiguration {
 
     @Value("${spring.kafka.bootstrap-servers}")
@@ -24,6 +26,7 @@ public class KafkaConfiguration {
     private String kafkaMessageGroupId;
 
     @Bean
+    @ConditionalOnProperty(prefix = "app.kafka", name = "enable", havingValue = "true")
     public <T> ConsumerFactory<String, T> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
         Map<String, Object> config = new HashMap<>();
 
@@ -38,6 +41,7 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "app.kafka", name = "enable", havingValue = "true")
     public <T> ConcurrentKafkaListenerContainerFactory<String, T>
     concurrentKafkaListenerContainerFactory(ConsumerFactory<String, T> kafkaMessageConsumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();

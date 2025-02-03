@@ -5,6 +5,8 @@ import com.example.statisticservice.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BookingReservationServiceImpl implements BookingReservationService {
@@ -13,5 +15,10 @@ public class BookingReservationServiceImpl implements BookingReservationService 
     @Override
     public void save(BookingReservationEntity reservation) {
         reservationRepository.save(reservation);
+    }
+
+    @Override
+    public List<BookingReservationEntity> findAll() {
+        return reservationRepository.findAll();
     }
 }

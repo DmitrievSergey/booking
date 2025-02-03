@@ -9,6 +9,7 @@ import com.example.statisticservice.service.BookingUserService;
 import com.example.statisticservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app.kafka", name = "enable", havingValue = "true")
 public class StatisticListener {
     private final BookingUserService userService;
     private final BookingReservationService reservationService;
