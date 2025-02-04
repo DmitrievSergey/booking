@@ -25,7 +25,6 @@ public class HotelServiceImpl implements HotelService {
     ReentrantLock lock = new ReentrantLock();
     private final HotelRepository hotelRepository;
 
-    //TODO: вместо synchronized reentrantlock
     @Override
     public Hotel save(Hotel hotel) {
 
@@ -33,24 +32,29 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public synchronized Hotel update(Hotel updatingHotel) {
+    public Hotel update(Hotel updatingHotel) {
+        lock.lock();
         Optional<Hotel> findingHotel = hotelRepository.findByNameAndAddressAndTown(
                 updatingHotel.getName(),
                 updatingHotel.getAddress(),
                 updatingHotel.getTown()
         );
         if (findingHotel.isPresent()
-                && !updatingHotel.getId().equals(findingHotel.get().getId())) throw new EntityAlreadyExistsException(
-                MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", updatingHotel.getName())
-        );
+                && !updatingHotel.getId().equals(findingHotel.get().getId())) {
+            lock.unlock();
+            throw new EntityAlreadyExistsException(
+                    MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", updatingHotel.getName())
+            );
+        }
         Hotel hotel = findHotelById(updatingHotel.getId());
         hotel.setAddress(updatingHotel.getAddress());
         hotel.setName(updatingHotel.getName());
         hotel.setTitle(updatingHotel.getTitle());
         hotel.setTown(updatingHotel.getTown());
         hotel.setDistance(updatingHotel.getDistance());
-
-        return hotelRepository.saveAndFlush(hotel);
+        hotelRepository.saveAndFlush(hotel);
+        lock.unlock();
+        return hotel;
     }
 
     @Override
@@ -75,7 +79,8 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public synchronized Hotel rateHotel(int rate, String hotelId) {
+    public Hotel rateHotel(int rate, String hotelId) {
+        lock.lock();
         Hotel hotel = findHotelById(hotelId);
         float rating = hotel.getRating();
         int numberOfRating = hotel.getNumberOfRating();
@@ -83,8 +88,9 @@ public class HotelServiceImpl implements HotelService {
         numberOfRating += 1;
         hotel.setNumberOfRating(numberOfRating);
         hotel.setRating((float) totalRating / numberOfRating);
-
-        return hotelRepository.saveAndFlush(hotel);
+        hotelRepository.saveAndFlush(hotel);
+        lock.unlock();
+        return findHotelById(hotelId);
     }
 
     @Override
@@ -103,10 +109,12 @@ public class HotelServiceImpl implements HotelService {
         if (hotelRepository.findByNameAndAddressAndTown(
                 hotel.getName(),
                 hotel.getAddress(),
-                hotel.getTown()).orElse(null) != null)
+                hotel.getTown()).orElse(null) != null) {
+            lock.unlock();
             throw new EntityAlreadyExistsException(
                     MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
             );
+        }
 
         Hotel savedHotel = hotelRepository.saveAndFlush(hotel);
         lock.unlock();

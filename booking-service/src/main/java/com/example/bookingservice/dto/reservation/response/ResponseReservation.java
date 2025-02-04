@@ -18,6 +18,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ResponseReservation {
 
+    private String id;
+
     private LocalDate startDate;
 
     private LocalDate endDate;

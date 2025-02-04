@@ -17,6 +17,7 @@ public interface ReservationMapper {
     ReservationInterval mapToEntity(Room room, RequestReserveRoom reserveRoom, User user);
 
     @Mapping(target = "user.name", source = "user.userName")
+    @Mapping(target = "id", source = "id")
     ResponseReservation mapToResponse(ReservationInterval reservationInterval);
 
 

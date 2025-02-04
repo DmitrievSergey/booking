@@ -26,7 +26,6 @@ public class KafkaConfiguration {
     private String kafkaMessageGroupId;
 
     @Bean
-    @ConditionalOnProperty(prefix = "app.kafka", name = "enable", havingValue = "true")
     public <T> ConsumerFactory<String, T> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
         Map<String, Object> config = new HashMap<>();
 
@@ -41,7 +40,6 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "app.kafka", name = "enable", havingValue = "true")
     public <T> ConcurrentKafkaListenerContainerFactory<String, T>
     concurrentKafkaListenerContainerFactory(ConsumerFactory<String, T> kafkaMessageConsumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();

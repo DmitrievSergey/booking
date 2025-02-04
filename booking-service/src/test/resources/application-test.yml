@@ -1,0 +1,8 @@
+spring:
+  jpa:
+    generate-ddl: true
+  datasource:
+    hikari:
+      connection-init-sql: CREATE SCHEMA IF NOT EXISTS booking_schema
+      schema: booking_schema
+

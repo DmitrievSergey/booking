@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.KafkaException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 

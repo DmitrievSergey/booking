@@ -6,6 +6,8 @@ import com.example.bookingservice.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,6 +17,14 @@ import java.util.Objects;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionHandlerController {
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<AuthorizationResult> notAuthorize(AuthorizationDeniedException exception) {
+        log.error("Пользователь не авторизован для этой операции {}", exception.getAuthorizationResult().toString());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(exception.getAuthorizationResult());
+    }
+
     @ExceptionHandler(EntityAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> notFound(EntityAlreadyExistsException exception) {
         log.error("Ошибка при получении сущности {}", exception.getMessage());

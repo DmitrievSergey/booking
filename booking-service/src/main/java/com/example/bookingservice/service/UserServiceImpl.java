@@ -11,21 +11,29 @@ import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    ReentrantLock lock = new ReentrantLock();
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    //TODO: добавить проверку на то, что пользователь с таким именем уже существует
+
     @Override
     public User save(User user) {
+        lock.lock();
         Optional<User> newUser = userRepository.findByEmailAndUserName(user.getEmail(), user.getUserName());
-        if(newUser.isPresent()) throw new EntityAlreadyExistsException(
-                MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Пользователь", user.getUserName())
-        );
+        if (newUser.isPresent()) {
+            lock.unlock();
+            throw new EntityAlreadyExistsException(
+                    MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Пользователь", user.getUserName())
+            );
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.saveAndFlush(user);
+        User savedUser = userRepository.saveAndFlush(user);
+        lock.unlock();
+        return savedUser;
     }
 
     @Override
