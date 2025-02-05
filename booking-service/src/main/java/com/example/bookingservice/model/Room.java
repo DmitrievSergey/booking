@@ -1,5 +1,6 @@
 package com.example.bookingservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ public class Room {
 
     @ManyToOne
     @JoinColumn(name = "hotel_id", nullable = false)
+    @JsonIgnore(value = true)
     private Hotel hotel;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "room")

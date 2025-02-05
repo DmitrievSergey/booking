@@ -19,22 +19,20 @@ import lombok.Setter;
 public class CreateRoomDto {
     @NotNull
     @Size(min = 3, max = 50, message = "Наименование комнаты не должно быть меньше {min} символов и не должно быть больше {max} символов")
-    String name;
+    private String name;
 
     @NotNull
     @Size(min = 3, max = 50, message = "Описание комнаты не должно быть меньше {min} символов и не должно быть больше {max} символов")
-    String description;
+    private String description;
 
     @NotNull
     @Size(min = 1, max = 5, message = "Номер комнаты не должен быть меньше {min} символов и не должно быть больше {max} символов")
-    String number;
+    private String number;
 
     @Positive
-    Float pricePerDay;
+    private Float pricePerDay;
 
     @Min(value = 1, message = "Количество людей в комнате должно быть больше или равно {value}")
-    Byte peopleCount;
+    private Byte peopleCount;
 
-    @NotNull
-    Hotel hotel;
 }

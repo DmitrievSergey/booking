@@ -35,6 +35,8 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:junit-jupiter:1.17.6")
     testImplementation("org.testcontainers:postgresql:1.17.6")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+    testImplementation("org.testcontainers:kafka")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

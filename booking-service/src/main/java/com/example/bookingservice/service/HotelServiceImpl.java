@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,20 +48,25 @@ public class HotelServiceImpl implements HotelService {
                     MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", updatingHotel.getName())
             );
         }
-        Hotel hotel = findHotelById(updatingHotel.getId());
-        BeanUtils.copyNonNullProperties(updatingHotel, hotel);
-//        hotel.setAddress(updatingHotel.getAddress());
-//        hotel.setName(updatingHotel.getName());
-//        hotel.setTitle(updatingHotel.getTitle());
-//        hotel.setTown(updatingHotel.getTown());
-//        hotel.setDistance(updatingHotel.getDistance());
-        hotelRepository.saveAndFlush(hotel);
-        lock.unlock();
-        return hotel;
+
+        try {
+            Hotel hotel = findHotelById(updatingHotel.getId());
+            BeanUtils.copyNonNullProperties(updatingHotel, hotel);
+            hotelRepository.saveAndFlush(hotel);
+            lock.unlock();
+            return hotel;
+        } catch (NoSuchElementException exception) {
+            lock.unlock();
+            throw new EntityNotFoundException(
+                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Отель", updatingHotel.getId())
+            );
+        }
+
+
     }
 
     @Override
-    public Hotel findHotelById(String hotelId) {
+    public Hotel findHotelById(String hotelId) throws NoSuchElementException {
         return hotelRepository.findById(hotelId)
                 .orElseThrow();
     }
@@ -72,23 +78,38 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public void deleteHotelById(String hotelId) {
-        Hotel deletingHotel = findHotelById(hotelId);
-        hotelRepository.deleteById(deletingHotel.getId());
+        try {
+            Hotel deletingHotel = findHotelById(hotelId);
+            hotelRepository.deleteById(deletingHotel.getId());
+        } catch (NoSuchElementException exception) {
+            throw new EntityNotFoundException(
+                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Отель", hotelId)
+            );
+        }
+
     }
 
     @Override
     public Hotel rateHotel(int rate, String hotelId) {
         lock.lock();
-        Hotel hotel = findHotelById(hotelId);
-        float rating = hotel.getRating();
-        int numberOfRating = hotel.getNumberOfRating();
-        int totalRating = (int) (numberOfRating * rating) + rate;
-        numberOfRating += 1;
-        hotel.setNumberOfRating(numberOfRating);
-        hotel.setRating((float) totalRating / numberOfRating);
-        hotelRepository.saveAndFlush(hotel);
-        lock.unlock();
-        return findHotelById(hotelId);
+        try {
+            Hotel hotel = findHotelById(hotelId);
+            float rating = hotel.getRating();
+            int numberOfRating = hotel.getNumberOfRating();
+            int totalRating = (int) (numberOfRating * rating) + rate;
+            numberOfRating += 1;
+            hotel.setNumberOfRating(numberOfRating);
+            hotel.setRating((float) totalRating / numberOfRating);
+            hotelRepository.saveAndFlush(hotel);
+            lock.unlock();
+            return findHotelById(hotelId);
+        } catch(NoSuchElementException exception) {
+            lock.unlock();
+            throw new EntityNotFoundException(
+                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Отель", hotelId)
+            );
+        }
+
     }
 
     @Override
