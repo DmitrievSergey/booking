@@ -4,6 +4,7 @@ import com.example.bookingservice.model.RoleType;
 import com.example.bookingservice.model.User;
 import com.example.bookingservice.repository.UserRepository;
 import com.example.bookingservice.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -88,5 +89,13 @@ public class AbstractTest {
     @AfterEach
     private void tearDown() {
         userRepository.deleteAll();
+    }
+
+    public static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

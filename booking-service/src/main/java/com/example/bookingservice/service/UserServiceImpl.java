@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     public User findByUserName(String userName) {
         return userRepository.findByUserName(userName).orElseThrow(
                 () -> new UsernameNotFoundException("User with name " +
-                        userName + "not found")
+                        userName + " not found")
         );
     }
 

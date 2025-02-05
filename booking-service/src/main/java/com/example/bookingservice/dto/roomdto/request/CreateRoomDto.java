@@ -1,6 +1,7 @@
 package com.example.bookingservice.dto.roomdto.request;
 
 
+import com.example.bookingservice.dto.hotel.request.HotelDto;
 import com.example.bookingservice.model.Hotel;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

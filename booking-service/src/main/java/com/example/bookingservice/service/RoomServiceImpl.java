@@ -3,6 +3,7 @@ package com.example.bookingservice.service;
 import com.example.bookingservice.dto.filter.RoomFilter;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
+import com.example.bookingservice.model.Hotel;
 import com.example.bookingservice.model.Room;
 import com.example.bookingservice.repository.HotelRepository;
 import com.example.bookingservice.repository.RoomRepository;
@@ -59,7 +60,7 @@ public class RoomServiceImpl implements RoomService {
                 && !roomId.equals(findingRoom.get().getId())) {
             lock.unlock();
             throw new EntityAlreadyExistsException(
-                    MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", room.getNumber())
+                    MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Комната", room.getNumber())
             );
         }
         Room updatingRoom = findRoomById(roomId);
@@ -77,17 +78,14 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Room findRoomById(String roomId) {
         return roomRepository.findById(roomId)
-                .orElseThrow(() -> {
-                            throw new EntityNotFoundException(
-                                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Комната", roomId)
-                            );
-                        }
-                );
+                .orElseThrow();
     }
 
     @Override
     public void deleteRoomById(String roomId) {
-        roomRepository.deleteById(roomId);
+
+        Room deletingRoom = findRoomById(roomId);
+        roomRepository.deleteById(deletingRoom.getId());
     }
 
     @Override

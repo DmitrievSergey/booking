@@ -8,6 +8,7 @@ import com.example.bookingservice.model.Hotel;
 import com.example.bookingservice.repository.HotelRepository;
 import com.example.bookingservice.repository.HotelSpecification;
 import com.example.bookingservice.utils.AppMessages;
+import com.example.bookingservice.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -47,11 +48,12 @@ public class HotelServiceImpl implements HotelService {
             );
         }
         Hotel hotel = findHotelById(updatingHotel.getId());
-        hotel.setAddress(updatingHotel.getAddress());
-        hotel.setName(updatingHotel.getName());
-        hotel.setTitle(updatingHotel.getTitle());
-        hotel.setTown(updatingHotel.getTown());
-        hotel.setDistance(updatingHotel.getDistance());
+        BeanUtils.copyNonNullProperties(updatingHotel, hotel);
+//        hotel.setAddress(updatingHotel.getAddress());
+//        hotel.setName(updatingHotel.getName());
+//        hotel.setTitle(updatingHotel.getTitle());
+//        hotel.setTown(updatingHotel.getTown());
+//        hotel.setDistance(updatingHotel.getDistance());
         hotelRepository.saveAndFlush(hotel);
         lock.unlock();
         return hotel;
@@ -60,12 +62,7 @@ public class HotelServiceImpl implements HotelService {
     @Override
     public Hotel findHotelById(String hotelId) {
         return hotelRepository.findById(hotelId)
-                .orElseThrow(() -> {
-                            throw new EntityNotFoundException(
-                                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Отель", hotelId)
-                            );
-                        }
-                );
+                .orElseThrow();
     }
 
     @Override
@@ -75,7 +72,8 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public void deleteHotelById(String hotelId) {
-        hotelRepository.deleteById(hotelId);
+        Hotel deletingHotel = findHotelById(hotelId);
+        hotelRepository.deleteById(deletingHotel.getId());
     }
 
     @Override
