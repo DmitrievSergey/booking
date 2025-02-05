@@ -1,6 +1,8 @@
 package com.example.bookingservice.exception;
 
-public class EntityNotFoundException extends RuntimeException{
+import java.util.NoSuchElementException;
+
+public class EntityNotFoundException extends RuntimeException {
     public EntityNotFoundException(String message) {
         super(message);
     }

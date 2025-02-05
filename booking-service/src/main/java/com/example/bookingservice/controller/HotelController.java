@@ -40,7 +40,8 @@ public class HotelController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<ResponseHotelDto> updateHotelById(@PathVariable(name = "id") String hotelId, @Valid @RequestBody HotelDto request) {
+    ResponseEntity<ResponseHotelDto> updateHotelById(@PathVariable(name = "id") String hotelId,
+                                                     @Valid @RequestBody HotelDto request) {
         Hotel updatingHotel = hotelMapper.map(hotelId, request);
 
         return ResponseEntity.ok(
@@ -62,9 +63,9 @@ public class HotelController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<Void> deleteHotel(@PathVariable(name = "id") String hotelId) {
+    ResponseEntity<String> deleteHotel(@PathVariable(name = "id") String hotelId) {
         hotelService.deleteHotelById(hotelId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Отель c id " + hotelId + "удален");
     }
 
     @PostMapping("/rate/{hotelId}")

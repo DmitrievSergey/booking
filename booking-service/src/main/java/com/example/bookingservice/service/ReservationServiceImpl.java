@@ -49,8 +49,7 @@ public class ReservationServiceImpl implements ReservationService{
 
 
     private Boolean checkInterval(String roomId,LocalDate startDate, LocalDate endDate) {
-        if (reservationRepository.checkIntervalForRoom(roomId, startDate, endDate).isEmpty()) return true;
-        return false;
+        return reservationRepository.checkIntervalForRoom(roomId, startDate, endDate).isEmpty();
     }
     //TODO: добавить проверку на то, что такая комната в этом отеле уже зарезервирована на эти даты
 }

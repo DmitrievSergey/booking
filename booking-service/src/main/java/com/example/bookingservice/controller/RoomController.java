@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -56,9 +57,10 @@ public class RoomController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<Void> deleteRoomById(@PathVariable(name = "id") String roomId) {
+    ResponseEntity<String> deleteRoomById(@PathVariable(name = "id") String roomId) {
         roomService.deleteRoomById(roomId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).contentType(MediaType.APPLICATION_JSON).
+                body("Комната с Id " + roomId + "удалена");
     }
 
     @GetMapping("/filter")

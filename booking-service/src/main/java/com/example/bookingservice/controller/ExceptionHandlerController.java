@@ -2,16 +2,17 @@ package com.example.bookingservice.controller;
 
 import com.example.bookingservice.dto.hotel.response.ErrorResponse;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
-import com.example.bookingservice.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Slf4j
@@ -19,10 +20,12 @@ import java.util.Objects;
 public class ExceptionHandlerController {
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<AuthorizationResult> notAuthorize(AuthorizationDeniedException exception) {
-        log.error("Пользователь не авторизован для этой операции {}", exception.getAuthorizationResult().toString());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(exception.getAuthorizationResult());
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthorizationDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new ErrorResponse(
+                        ex.getLocalizedMessage())
+        );
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
@@ -31,8 +34,9 @@ public class ExceptionHandlerController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(exception.getLocalizedMessage()));
     }
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> notFound(EntityNotFoundException exception) {
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ErrorResponse> notFound(NoSuchElementException exception) {
         log.error("Ошибка при получении сущности {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(exception.getLocalizedMessage()));
