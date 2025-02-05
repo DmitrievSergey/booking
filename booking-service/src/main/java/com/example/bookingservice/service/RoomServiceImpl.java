@@ -5,10 +5,10 @@ import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
 import com.example.bookingservice.model.Hotel;
 import com.example.bookingservice.model.Room;
-import com.example.bookingservice.repository.HotelRepository;
 import com.example.bookingservice.repository.RoomRepository;
 import com.example.bookingservice.repository.RoomSpecification;
 import com.example.bookingservice.utils.AppMessages;
+import com.example.bookingservice.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -25,11 +26,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class RoomServiceImpl implements RoomService {
     ReentrantLock lock = new ReentrantLock();
     private final RoomRepository roomRepository;
-    private final HotelRepository hotelRepository;
 
     @Override
     public Room save(Room room) {
-        //TODO: добавить проверку на отель
         lock.lock();
 
         Optional<Room> creatingRoom = roomRepository.findByNumberAndHotel(
@@ -63,29 +62,39 @@ public class RoomServiceImpl implements RoomService {
                     MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Комната", room.getNumber())
             );
         }
-        Room updatingRoom = findRoomById(roomId);
-        updatingRoom.setName(room.getName());
-        updatingRoom.setDescription(room.getDescription());
-        updatingRoom.setNumber(room.getNumber());
-        updatingRoom.setPricePerDay(room.getPricePerDay());
-        updatingRoom.setPeopleCount(room.getPeopleCount());
-        roomRepository.saveAndFlush(updatingRoom);
-        updatingRoom.getHotel().addRoom(room);
-        lock.unlock();
-        return updatingRoom;
+        try {
+            Room updatingRoom = findRoomById(roomId);
+            BeanUtils.copyNonNullProperties(room, updatingRoom);
+            roomRepository.saveAndFlush(updatingRoom);
+            updatingRoom.getHotel().addRoom(room);
+            lock.unlock();
+            return updatingRoom;
+        } catch (NoSuchElementException exception) {
+            lock.unlock();
+            throw new EntityNotFoundException(
+                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Комната", roomId)
+            );
+        }
+
     }
 
     @Override
-    public Room findRoomById(String roomId) {
+    public Room findRoomById(String roomId) throws NoSuchElementException {
         return roomRepository.findById(roomId)
                 .orElseThrow();
     }
 
     @Override
     public void deleteRoomById(String roomId) {
+        try {
+            Room deletingRoom = findRoomById(roomId);
+            roomRepository.deleteById(deletingRoom.getId());
+        } catch (NoSuchElementException exception) {
+            throw new EntityNotFoundException(
+                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Комната", roomId)
+            );
+        }
 
-        Room deletingRoom = findRoomById(roomId);
-        roomRepository.deleteById(deletingRoom.getId());
     }
 
     @Override

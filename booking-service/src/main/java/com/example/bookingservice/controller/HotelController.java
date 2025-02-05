@@ -4,6 +4,7 @@ import com.example.bookingservice.dto.filter.HotelFilter;
 import com.example.bookingservice.dto.hotel.request.HotelDto;
 import com.example.bookingservice.dto.hotel.response.ResponseFindHotelById;
 import com.example.bookingservice.dto.hotel.response.ResponseHotelDto;
+import com.example.bookingservice.dto.roomdto.response.ResponseDeleteRoomDto;
 import com.example.bookingservice.mapper.HotelMapper;
 import com.example.bookingservice.model.Hotel;
 import com.example.bookingservice.service.HotelService;
@@ -63,9 +64,9 @@ public class HotelController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<String> deleteHotel(@PathVariable(name = "id") String hotelId) {
+    ResponseEntity<ResponseDeleteRoomDto> deleteHotel(@PathVariable(name = "id") String hotelId) {
         hotelService.deleteHotelById(hotelId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Отель c id " + hotelId + "удален");
+        return ResponseEntity.ok(new ResponseDeleteRoomDto("Отель с Id " + hotelId + " удален"));
     }
 
     @PostMapping("/rate/{hotelId}")
