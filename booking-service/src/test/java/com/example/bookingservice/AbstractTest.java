@@ -44,7 +44,7 @@ import java.util.Properties;
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles({"test"})
-//@Testcontainers
+@Testcontainers
 public abstract class AbstractTest implements PostgreBaseTest {
     static  {
         POSTGRE_SQL_CONTAINER.start();
@@ -65,13 +65,6 @@ public abstract class AbstractTest implements PostgreBaseTest {
         POSTGRE_SQL_CONTAINER.withEnv("spring.datasource.password", (p) -> POSTGRE_SQL_CONTAINER.getPassword());
 
     }
-//
-//    @AfterAll
-//    public static void afterAll() {
-//        KAFKA_CONTAINER.close();
-//        POSTGRE_SQL_CONTAINER.close();
-//
-//    }
 
 
     @Autowired

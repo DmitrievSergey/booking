@@ -3,17 +3,28 @@ package com.example.bookingservice.controller;
 import com.example.bookingservice.AbstractTest;
 import com.example.bookingservice.PostgreBaseTest;
 import com.example.bookingservice.dto.hotel.request.HotelDto;
+import com.example.bookingservice.dto.reservation.request.RequestReserveRoom;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
+import com.example.bookingservice.model.Hotel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,6 +41,31 @@ public class TestHotelRestController extends AbstractTest {
     private String updatedAddress = "Tverskaja Street 1 updated";
     private String updatedTitle = "First hotel title updated";
     private String updatedTown = "Moscow updated";
+
+    @Test
+    @DisplayName("Create hotel by admin")
+    @WithMockUser(username = "Alex", roles = "ADMIN")
+    public void whenCreateHotelsWithSameNameAddressAndTown_ThenOnlyOneHotelCreated() throws Exception {
+        Runnable hotel = () ->
+        {
+
+            try {
+                ResultActions result = post("/api/v1/hotel/add", new HotelDto(
+                        "firstHotel"
+                        , "Title with 10 simbols"
+                        , "Moscow"
+                        , "address 1"
+                        , "9"));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        executor.execute(hotel);
+        executor.execute(hotel);
+    }
 
     @Test
     @DisplayName("Create hotel by admin")

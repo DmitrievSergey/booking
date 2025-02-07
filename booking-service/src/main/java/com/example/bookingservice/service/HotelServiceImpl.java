@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -30,7 +31,7 @@ public class HotelServiceImpl implements HotelService {
     @Override
     public Hotel save(Hotel hotel) {
 
-        return checkAndSave(hotel);
+        return checkAndSaveTransactional(hotel);
     }
 
     @Override
@@ -137,6 +138,20 @@ public class HotelServiceImpl implements HotelService {
 
         Hotel savedHotel = hotelRepository.saveAndFlush(hotel);
         lock.unlock();
+        return savedHotel;
+    }
+    @Transactional
+    Hotel checkAndSaveTransactional(Hotel hotel) {
+        if (hotelRepository.findByNameAndAddressAndTown(
+                hotel.getName(),
+                hotel.getAddress(),
+                hotel.getTown()).orElse(null) != null) {
+            throw new EntityAlreadyExistsException(
+                    MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
+            );
+        }
+
+        Hotel savedHotel = hotelRepository.saveAndFlush(hotel);
         return savedHotel;
     }
 }
