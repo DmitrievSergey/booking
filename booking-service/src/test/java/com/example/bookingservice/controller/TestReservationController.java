@@ -12,11 +12,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -26,9 +33,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Testcontainers
 public class TestReservationController extends AbstractTest {
 
+    @Container
+    protected static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
+            DockerImageName.parse("confluentinc/cp-kafka:7.3.3")
+    );
+
+    @DynamicPropertySource
+    static void kafkaProperties(DynamicPropertyRegistry properties) {
+        properties.add("spring.kafka.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers);
+    }
 
 
     private String hotelId = "e913b22d-5d21-4998-ae8f-a258fca8913f";
