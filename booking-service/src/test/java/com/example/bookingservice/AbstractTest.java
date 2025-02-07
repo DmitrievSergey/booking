@@ -1,10 +1,16 @@
 package com.example.bookingservice;
 
+import com.example.basedomain.RoomReservationEvent;
+import com.example.bookingservice.aop.SendEventAfter;
 import com.example.bookingservice.model.RoleType;
 import com.example.bookingservice.model.User;
 import com.example.bookingservice.repository.UserRepository;
+import com.example.bookingservice.service.KafkaMessagePublisher;
 import com.example.bookingservice.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,65 +20,70 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
-@ExtendWith(SpringExtension.class)
+
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Transactional
-@ActiveProfiles("test")
-@Testcontainers
-public class AbstractTest {
-    @LocalServerPort
-    private Integer port;
-
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            "postgres:12.3"
-    );
-
-    @BeforeAll
-    static void beforeAll() {
-        postgres.start();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgres.stop();
-    }
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+@ActiveProfiles({"test"})
+//@Testcontainers
+public abstract class AbstractTest implements PostgreBaseTest {
+    static  {
+        POSTGRE_SQL_CONTAINER.start();
     }
 
     @Autowired
-    private UserService userService;
+    protected SendEventAfter sendEventAfter;
+    @Autowired
+    protected UserService userService;
 
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    @BeforeAll
+    public static void beforeAll() {
+        POSTGRE_SQL_CONTAINER.withEnv("spring.datasource.url", (p) -> POSTGRE_SQL_CONTAINER.getJdbcUrl());
+        POSTGRE_SQL_CONTAINER.withEnv("spring.datasource.username", (p) -> POSTGRE_SQL_CONTAINER.getUsername());
+        POSTGRE_SQL_CONTAINER.withEnv("spring.datasource.password", (p) -> POSTGRE_SQL_CONTAINER.getPassword());
+
+    }
+//
+//    @AfterAll
+//    public static void afterAll() {
+//        KAFKA_CONTAINER.close();
+//        POSTGRE_SQL_CONTAINER.close();
+//
+//    }
+
 
     @Autowired
     protected MockMvc mockMvc;
 
+    @Autowired
+    protected ObjectMapper objectMapper;
+
     @BeforeEach
     private void setUp() {
         User userAdmin = new User();
-        userAdmin.setEmail("alex@admin.ru");
+        userAdmin.setEmail("admin@admin.ru");
         userAdmin.setPassword("adminpassword");
         userAdmin.setUserName("Alex");
         userAdmin.setRoles(new String[]{RoleType.ROLE_ADMIN.name()});
@@ -91,11 +102,28 @@ public class AbstractTest {
         userRepository.deleteAll();
     }
 
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    protected ResultActions post(String path, Object pathVariable, Object object) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders
+                .post(path, pathVariable)
+                .content(objectMapper.writeValueAsString(object))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
     }
+
+    protected ResultActions post(String path, Object object) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders
+                .post(path)
+                .content(objectMapper.writeValueAsString(object))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
+    protected ResultActions post(String path, String pathParamName, String pathParam, Object object) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders
+                .post(path).param(pathParamName, pathParam)
+                .content(objectMapper.writeValueAsString(object))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
 }

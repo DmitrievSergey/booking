@@ -1,6 +1,5 @@
 package com.example.bookingservice.dto.reservation.request;
 
-import com.example.bookingservice.model.Room;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,5 @@ public class RequestReserveRoom {
     @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate endDate;
 
-//    @NotNull
-//    private Room room;
 
 }

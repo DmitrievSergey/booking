@@ -80,16 +80,28 @@ public class SendEventAfter {
                 reservation.getRoom().getId(),
                 reservation.getStartDate(),
                 reservation.getEndDate()));
-        kafkaMessagePublisher.sendRoomReservationEvent(event);
-        log.info("Message sent to kafka");
+        try {
+            kafkaMessagePublisher.sendRoomReservationEvent(event);
+            log.info("Message sent to kafka");
+        } catch (KafkaException exception) {
+            log.info("Cant send message to kafka {}", exception.getMessage());
+        }
+
+
     }
 
     private void sendUserRegisteredEvent(ResponseEntity entity) {
         ResponseUser user = (ResponseUser) entity.getBody();
         UserRegistrationEvent event = new UserRegistrationEvent();
         event.setUserRegistration(new UserRegistration(user.getId()));
-        kafkaMessagePublisher.sendUserRegistrationEvent(event);
-        log.info("Message sent to kafka");
+        try {
+            kafkaMessagePublisher.sendUserRegistrationEvent(event);
+            log.info("Message sent to kafka");
+        } catch(KafkaException exception) {
+            log.info("Message sent to kafka {}", exception.getMessage());
+        }
+
+
     }
 
 }

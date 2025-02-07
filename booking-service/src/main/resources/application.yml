@@ -8,7 +8,8 @@ spring:
     hikari:
       schema: booking_schema
   kafka:
-    bootstrap-servers: PLAINTEXT://broker:9092
+      bootstrap-servers:
+        - ${broker:localhost}:9092
 
 app:
   kafka:

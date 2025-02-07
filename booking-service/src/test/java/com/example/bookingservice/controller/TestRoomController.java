@@ -1,6 +1,7 @@
 package com.example.bookingservice.controller;
 
 import com.example.bookingservice.AbstractTest;
+import com.example.bookingservice.PostgreBaseTest;
 import com.example.bookingservice.dto.roomdto.request.CreateRoomDto;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
@@ -35,7 +37,7 @@ public class TestRoomController extends AbstractTest {
     public void whenAdminCreateRoom_ThenRoomCreated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/room/add").param("hotelId",hotelId)
-                        .content(asJsonString(new CreateRoomDto(
+                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
                                 "king room"
                                 , "King room with sea view"
                                 , "1"
@@ -60,7 +62,7 @@ public class TestRoomController extends AbstractTest {
     public void whenAdminCreateRoomWithExistingNumberInHotel_Then500() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/room/add").param("hotelId",hotelId)
-                        .content(asJsonString(new CreateRoomDto(
+                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
                                 "king room"
                                 , "King room with sea view"
                                 , "1"
@@ -81,7 +83,7 @@ public class TestRoomController extends AbstractTest {
     public void whenAdminCreateRoomWithNonExistingHotel_Then404() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/room/add").param("hotelId","123")
-                        .content(asJsonString(new CreateRoomDto(
+                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
                                 "king room"
                                 , "King room with sea view"
                                 , "1"
@@ -102,7 +104,7 @@ public class TestRoomController extends AbstractTest {
     public void whenAdminChangeRoom_ThenRoomChanged() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/room/{roomId}", roomId)
-                        .content(asJsonString(new CreateRoomDto(
+                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
                                 "king room updated"
                                 , "King room with sea view updated"
                                 , "10"
@@ -127,7 +129,7 @@ public class TestRoomController extends AbstractTest {
     public void whenUserCreateRoom_Then401() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/room/add").param("hotelId", hotelId)
-                        .content(asJsonString(new CreateRoomDto(
+                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
                                 "king room updated"
                                 , "King room with sea view updated"
                                 , "1"
@@ -146,7 +148,7 @@ public class TestRoomController extends AbstractTest {
     public void whenUserChangeRoom_Then401() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/room/{roomId}", roomId)
-                        .content(asJsonString(new CreateRoomDto(
+                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
                                 "king room updated"
                                 , "King room with sea view updated"
                                 , "1"

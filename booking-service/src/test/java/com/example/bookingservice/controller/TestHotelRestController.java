@@ -1,6 +1,7 @@
 package com.example.bookingservice.controller;
 
 import com.example.bookingservice.AbstractTest;
+import com.example.bookingservice.PostgreBaseTest;
 import com.example.bookingservice.dto.hotel.request.HotelDto;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
@@ -36,7 +37,7 @@ public class TestHotelRestController extends AbstractTest {
     public void whenAdminCreateHotel_ThenHotelCreated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/hotel/add")
-                        .content(asJsonString(new HotelDto(
+                        .content(objectMapper.writeValueAsString(new HotelDto(
                                 "firstHotel"
                                 , "Title with 10 simbols"
                                 , "Moscow"
@@ -60,7 +61,7 @@ public class TestHotelRestController extends AbstractTest {
     public void whenAdminUpdateHotel_ThenHotelUpdated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/hotel/{id}", hotelId)
-                        .content(asJsonString(new HotelDto(
+                        .content(objectMapper.writeValueAsString(new HotelDto(
                                 updatedName
                                 , updatedTitle
                                 , updatedTown
@@ -83,7 +84,7 @@ public class TestHotelRestController extends AbstractTest {
     public void whenAdminUpdateNonExistingHotel_Then404() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/hotel/{id}", hotelId)
-                        .content(asJsonString(new HotelDto(
+                        .content(objectMapper.writeValueAsString(new HotelDto(
                                 updatedName
                                 , updatedTitle
                                 , updatedTown
@@ -103,7 +104,7 @@ public class TestHotelRestController extends AbstractTest {
     public void whenUserCreateHotel_ThenHotelDoesNotCreated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/hotel/add")
-                        .content(asJsonString(new HotelDto(
+                        .content(objectMapper.writeValueAsString(new HotelDto(
                                 "First hotel"
                                 , "First hotel title"
                                 , "Moscow"
@@ -124,7 +125,7 @@ public class TestHotelRestController extends AbstractTest {
     public void whenHotelWithExistingNameAddressTownCreated_ThenException() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/hotel/add")
-                        .content(asJsonString(new HotelDto(
+                        .content(objectMapper.writeValueAsString(new HotelDto(
                                 existingName
                                 , "First hotel title"
                                 , existingTown
