@@ -1,13 +1,11 @@
 package com.example.bookingservice.controller;
 
-import com.example.basedomain.RoomReservationEvent;
 import com.example.bookingservice.AbstractTest;
 
+import com.example.bookingservice.KafkaBaseTest;
 import com.example.bookingservice.dto.reservation.request.RequestReserveRoom;
 
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,18 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
-
-import java.time.Duration;
 import java.time.LocalDate;
-import java.util.*;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,18 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-public class TestReservationController extends AbstractTest {
-
-    @Container
-    protected static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:7.3.3")
-    );
-
-    @DynamicPropertySource
-    static void kafkaProperties(DynamicPropertyRegistry properties) {
-        properties.add("spring.kafka.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers);
-    }
-
+@Sql(scripts = "classpath:db/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+public class TestReservationController extends AbstractTest implements KafkaBaseTest {
 
     private String hotelId = "e913b22d-5d21-4998-ae8f-a258fca8913f";
     private String anotherHotelId = "e913b22d-5d21-4998-ae8f-a258fca8913d";
@@ -57,15 +38,14 @@ public class TestReservationController extends AbstractTest {
     private String nonExistingRoomId = "4c5fb29a-eb4d-4485-a1f5-801de75f9335";
 
 
-    @Test
+    @ParameterizedTest()
+    @CsvSource({"1977-04-01, 1977-04-05"})
     @DisplayName("Test create reservation by admin")
     @Sql("classpath:db/createRoom.sql")
     @WithUserDetails(userDetailsServiceBeanName = "userDetailsServiceImpl"
             , value = "Alex"
             , setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    public void whenAdminCreateRoomReservation_ThenReservationCreated() throws Exception {
-        LocalDate dateStart = LocalDate.of(1977, 4, 1);
-        LocalDate dateEnd = LocalDate.of(1977, 4, 5);
+    public void whenAdminCreateRoomReservation_ThenReservationCreated(LocalDate dateStart, LocalDate dateEnd) throws Exception {
 
 
         String userId = userService.findByUserName("Alex").getId();
@@ -146,7 +126,7 @@ public class TestReservationController extends AbstractTest {
                 startDate
                 , endDate
         ))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isConflict())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityAlreadyExistsException))
                 .andExpect(result -> assertEquals("Интервал with name "+ startDate +" - "+ endDate +" already exists", result.getResolvedException().getMessage()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Интервал with name "+ startDate +" - "+ endDate +" already exists"));;

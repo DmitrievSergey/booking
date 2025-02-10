@@ -1,35 +1,25 @@
 package com.example.bookingservice.controller;
 
 import com.example.bookingservice.AbstractTest;
-import com.example.bookingservice.PostgreBaseTest;
 import com.example.bookingservice.dto.hotel.request.HotelDto;
-import com.example.bookingservice.dto.reservation.request.RequestReserveRoom;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
-import com.example.bookingservice.model.Hotel;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Sql(scripts = "classpath:db/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class TestHotelRestController extends AbstractTest {
     private String hotelId = "e913b22d-5d21-4998-ae8f-a258fca8913f";
     private String nonExistingHotelId = "a913b22d-5d21-4998-ae8f-a258fca8913f";
@@ -42,77 +32,43 @@ public class TestHotelRestController extends AbstractTest {
     private String updatedTitle = "First hotel title updated";
     private String updatedTown = "Moscow updated";
 
-    @Test
-    @DisplayName("Create hotel by admin")
-    @WithMockUser(username = "Alex", roles = "ADMIN")
-    public void whenCreateHotelsWithSameNameAddressAndTown_ThenOnlyOneHotelCreated() throws Exception {
-        Runnable hotel = () ->
-        {
 
-            try {
-                ResultActions result = post("/api/v1/hotel/add", new HotelDto(
-                        "firstHotel"
-                        , "Title with 10 simbols"
-                        , "Moscow"
-                        , "address 1"
-                        , "9"));
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        };
-
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        executor.execute(hotel);
-        executor.execute(hotel);
-    }
 
     @Test
     @DisplayName("Create hotel by admin")
     @WithMockUser(username = "Alex", roles = "ADMIN")
     public void whenAdminCreateHotel_ThenHotelCreated() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/api/v1/hotel/add")
-                        .content(objectMapper.writeValueAsString(new HotelDto(
-                                "firstHotel"
-                                , "Title with 10 simbols"
-                                , "Moscow"
-                                , "address 1"
-                                , "9")))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+        post("/api/v1/hotel/add", getHotelDto())
                 .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").isString())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("firstHotel"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Title with 10 simbols"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.town").value("Moscow"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value("address 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.distance").value("9"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(getHotelDto().getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(getHotelDto().getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.town").value(getHotelDto().getTown()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value(getHotelDto().getAddress()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.distance").value(getHotelDto().getDistance()));
+
     }
+
 
     @Test
     @DisplayName("Update existing hotel by admin")
-    @Sql("classpath:db/createHotel.sql")
+    @Sql(scripts = "classpath:db/createHotel.sql")
     @WithMockUser(username = "Alex", roles = "ADMIN")
     public void whenAdminUpdateHotel_ThenHotelUpdated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/hotel/{id}", hotelId)
-                        .content(objectMapper.writeValueAsString(new HotelDto(
-                                updatedName
-                                , updatedTitle
-                                , updatedTown
-                                , updatedAddress
-                                , "9")))
+                        .content(objectMapper.writeValueAsString(getUpdatedHotel()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(hotelId))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(updatedName))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(updatedTitle))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.town").value(updatedTown))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value(updatedAddress))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.distance").value("9"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(getUpdatedHotel().getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(getUpdatedHotel().getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.town").value(getUpdatedHotel().getTown()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value(getUpdatedHotel().getAddress()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.distance").value(getUpdatedHotel().getDistance()));
     }
+
 
     @Test
     @DisplayName("Update non existing hotel by admin")
@@ -120,12 +76,7 @@ public class TestHotelRestController extends AbstractTest {
     public void whenAdminUpdateNonExistingHotel_Then404() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/hotel/{id}", hotelId)
-                        .content(objectMapper.writeValueAsString(new HotelDto(
-                                updatedName
-                                , updatedTitle
-                                , updatedTown
-                                , updatedAddress
-                                , "9")))
+                        .content(objectMapper.writeValueAsString(getUpdatedHotel()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -140,12 +91,7 @@ public class TestHotelRestController extends AbstractTest {
     public void whenUserCreateHotel_ThenHotelDoesNotCreated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/hotel/add")
-                        .content(objectMapper.writeValueAsString(new HotelDto(
-                                "First hotel"
-                                , "First hotel title"
-                                , "Moscow"
-                                , "Tverskaja Street 1"
-                                , "9")))
+                        .content(objectMapper.writeValueAsString(getHotelDto()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
@@ -161,15 +107,10 @@ public class TestHotelRestController extends AbstractTest {
     public void whenHotelWithExistingNameAddressTownCreated_ThenException() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/hotel/add")
-                        .content(objectMapper.writeValueAsString(new HotelDto(
-                                existingName
-                                , "First hotel title"
-                                , existingTown
-                                , existingAddress
-                                , "9")))
+                        .content(objectMapper.writeValueAsString(getExistingHotel()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isConflict())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityAlreadyExistsException))
                 .andExpect(result -> assertEquals("Отель with name "+ existingName +" already exists", result.getResolvedException().getMessage()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Отель with name "+ existingName +" already exists"));
@@ -194,7 +135,7 @@ public class TestHotelRestController extends AbstractTest {
     @WithUserDetails(userDetailsServiceBeanName = "userDetailsServiceImpl"
             , value = "Alex"
             , setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    public void whenDeleteHotelWithOutRooms_ThenOk() throws Exception {
+    public void whenDeleteHotelWithoutRooms_ThenOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/api/v1/hotel/{id}", hotelId))
                 .andExpect(status().isOk())
@@ -214,6 +155,36 @@ public class TestHotelRestController extends AbstractTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
                 .andExpect(result -> assertEquals("Отель with ID "+ nonExistingHotelId +" not exists", result.getResolvedException().getMessage()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Отель with ID "+ nonExistingHotelId +" not exists"));
+    }
+
+    @NotNull
+    private HotelDto getHotelDto() {
+        return new HotelDto(
+                "firstHotel"
+                , "Title with 10 simbols"
+                , "Moscow"
+                , "address 1"
+                , "9");
+    }
+
+    @NotNull
+    private HotelDto getUpdatedHotel() {
+        return new HotelDto(
+                updatedName
+                , updatedTitle
+                , updatedTown
+                , updatedAddress
+                , "9");
+    }
+
+    @NotNull
+    private HotelDto getExistingHotel() {
+        return new HotelDto(
+                existingName
+                , "First hotel title"
+                , existingTown
+                , existingAddress
+                , "9");
     }
 
 }

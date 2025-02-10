@@ -1,14 +1,12 @@
 package com.example.bookingservice.controller;
 
-import com.example.basedomain.UserRegistration;
-import com.example.basedomain.UserRegistrationEvent;
+
 import com.example.bookingservice.aop.SendEvent;
 import com.example.bookingservice.dto.user.request.RequestCreateUser;
 import com.example.bookingservice.dto.user.response.ResponseUser;
 import com.example.bookingservice.mapper.UserMapper;
 import com.example.bookingservice.model.RoleType;
 import com.example.bookingservice.model.User;
-import com.example.bookingservice.service.KafkaMessagePublisher;
 import com.example.bookingservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
