@@ -5,6 +5,7 @@ import com.example.bookingservice.aop.SendEventAfter;
 import com.example.bookingservice.model.RoleType;
 import com.example.bookingservice.model.User;
 import com.example.bookingservice.repository.UserRepository;
+import com.example.bookingservice.service.HotelService;
 import com.example.bookingservice.service.KafkaMessagePublisher;
 import com.example.bookingservice.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +39,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.List;
 import java.util.Properties;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -51,7 +53,8 @@ public abstract class AbstractTest implements PostgreBaseTest {
     }
 
     @Autowired
-    protected SendEventAfter sendEventAfter;
+    protected HotelService hotelService;
+
     @Autowired
     protected UserService userService;
 
@@ -105,7 +108,7 @@ public abstract class AbstractTest implements PostgreBaseTest {
 
     protected ResultActions post(String path, Object object) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders
-                .post(path)
+                .post(path).with(csrf())
                 .content(objectMapper.writeValueAsString(object))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));

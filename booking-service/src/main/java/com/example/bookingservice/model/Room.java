@@ -39,4 +39,14 @@ public class Room {
     public void addInterval(ReservationInterval interval) {
         intervalList.add(interval);
     }
+
+    public Room(String id, String name, String description, String number, Float pricePerDay, Byte peopleCount, Hotel hotel) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.number = number;
+        this.pricePerDay = pricePerDay;
+        this.peopleCount = peopleCount;
+        this.hotel = hotel;
+    }
 }

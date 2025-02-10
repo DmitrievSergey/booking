@@ -21,4 +21,6 @@ public interface HotelService {
 
     List<Hotel> filterBy(HotelFilter filter);
 
+    List<Hotel> findAll();
+
 }

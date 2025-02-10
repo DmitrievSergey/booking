@@ -40,6 +40,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.awaitility:awaitility:4.2.0")
+    testImplementation("org.mockito:mockito-core:5.5.0")
+    testImplementation("com.github.javafaker:javafaker:0.12")
 }
 
 tasks.withType<Test> {

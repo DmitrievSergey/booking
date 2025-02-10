@@ -6,11 +6,9 @@ import com.example.bookingservice.dto.roomdto.request.CreateRoomDto;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
@@ -21,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
+@Sql(scripts = "classpath:db/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class TestRoomController extends AbstractTest {
 
     private String hotelId = "e913b22d-5d21-4998-ae8f-a258fca8913f";
@@ -36,21 +34,16 @@ public class TestRoomController extends AbstractTest {
     public void whenAdminCreateRoom_ThenRoomCreated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/room/add").param("hotelId",hotelId)
-                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
-                                "king room"
-                                , "King room with sea view"
-                                , "1"
-                                , 500.0f
-                                ,(byte)2)))
+                        .content(objectMapper.writeValueAsString(getCreateRoomDto()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").isString())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("king room"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("King room with sea view"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.number").value("1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pricePerDay").value(500.0f))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.peopleCount").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(getCreateRoomDto().getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(getCreateRoomDto().getDescription()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.number").value(getCreateRoomDto().getNumber()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pricePerDay").value(getCreateRoomDto().getPricePerDay()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.peopleCount").value((int)getCreateRoomDto().getPeopleCount()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hotel.id").value(hotelId));
     }
 
@@ -58,18 +51,13 @@ public class TestRoomController extends AbstractTest {
     @DisplayName("Test create room with existing number in hotel create by admin")
     @WithMockUser(username = "Alex", roles = "ADMIN")
     @Sql("classpath:db/createRoom.sql")
-    public void whenAdminCreateRoomWithExistingNumberInHotel_Then500() throws Exception {
+    public void whenAdminCreateRoomWithExistingNumberInHotel_Then409() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/room/add").param("hotelId",hotelId)
-                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
-                                "king room"
-                                , "King room with sea view"
-                                , "1"
-                                , 500.0f
-                                ,(byte)2)))
+                        .content(objectMapper.writeValueAsString(getCreateRoomDto()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isConflict())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityAlreadyExistsException))
                 .andExpect(result -> assertEquals("Комната with name 1 already exists", result.getResolvedException().getMessage()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Комната with name 1 already exists"));
@@ -82,12 +70,7 @@ public class TestRoomController extends AbstractTest {
     public void whenAdminCreateRoomWithNonExistingHotel_Then404() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/room/add").param("hotelId","123")
-                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
-                                "king room"
-                                , "King room with sea view"
-                                , "1"
-                                , 500.0f
-                                ,(byte)2)))
+                        .content(objectMapper.writeValueAsString(getCreateRoomDto()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -103,21 +86,16 @@ public class TestRoomController extends AbstractTest {
     public void whenAdminChangeRoom_ThenRoomChanged() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/room/{roomId}", roomId)
-                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
-                                "king room updated"
-                                , "King room with sea view updated"
-                                , "10"
-                                , 1000.0f
-                                ,(byte)3)))
+                        .content(objectMapper.writeValueAsString(getCreateRoomDtoUpdated()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isString())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("king room updated"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("King room with sea view updated"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.number").value("10"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pricePerDay").value(1000.0f))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.peopleCount").value(3))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(roomId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(getCreateRoomDtoUpdated().getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(getCreateRoomDtoUpdated().getDescription()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.number").value(getCreateRoomDtoUpdated().getNumber()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pricePerDay").value(getCreateRoomDtoUpdated().getPricePerDay()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.peopleCount").value((int)getCreateRoomDtoUpdated().getPeopleCount()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hotel.id").value(hotelId));
     }
 
@@ -128,12 +106,7 @@ public class TestRoomController extends AbstractTest {
     public void whenUserCreateRoom_Then401() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/room/add").param("hotelId", hotelId)
-                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
-                                "king room updated"
-                                , "King room with sea view updated"
-                                , "1"
-                                , 1000.0f
-                                ,(byte)3)))
+                        .content(objectMapper.writeValueAsString(getCreateRoomDtoUpdated()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
@@ -147,17 +120,13 @@ public class TestRoomController extends AbstractTest {
     public void whenUserChangeRoom_Then401() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/room/{roomId}", roomId)
-                        .content(objectMapper.writeValueAsString(new CreateRoomDto(
-                                "king room updated"
-                                , "King room with sea view updated"
-                                , "1"
-                                , 1000.0f
-                                ,(byte)3)))
+                        .content(objectMapper.writeValueAsString(getCreateRoomDtoUpdated()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Access Denied"));
     }
+
 
     @Test
     @DisplayName("Test delete non existing room by admin")
@@ -184,11 +153,23 @@ public class TestRoomController extends AbstractTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Комната с Id " + roomId + " удалена"));
     }
 
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @NotNull
+    private CreateRoomDto getCreateRoomDto() {
+        return new CreateRoomDto(
+                "king room"
+                , "King room with sea view"
+                , "1"
+                , 500.0f
+                ,(byte)2);
+    }
+
+    @NotNull
+    private CreateRoomDto getCreateRoomDtoUpdated() {
+        return new CreateRoomDto(
+                "king room updated"
+                , "King room with sea view updated"
+                , "1"
+                , 1000.0f
+                ,(byte)3);
     }
 }

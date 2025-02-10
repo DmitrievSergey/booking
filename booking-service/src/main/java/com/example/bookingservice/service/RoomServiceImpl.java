@@ -62,38 +62,31 @@ public class RoomServiceImpl implements RoomService {
                     MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Комната", room.getNumber())
             );
         }
-        try {
-            Room updatingRoom = findRoomById(roomId);
-            BeanUtils.copyNonNullProperties(room, updatingRoom);
-            roomRepository.saveAndFlush(updatingRoom);
-            updatingRoom.getHotel().addRoom(room);
-            lock.unlock();
-            return updatingRoom;
-        } catch (NoSuchElementException exception) {
-            lock.unlock();
-            throw new EntityNotFoundException(
-                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Комната", roomId)
-            );
-        }
+
+        Room updatingRoom = findRoomById(roomId);
+        BeanUtils.copyNonNullProperties(room, updatingRoom);
+        roomRepository.saveAndFlush(updatingRoom);
+        updatingRoom.getHotel().addRoom(room);
+        lock.unlock();
+        return updatingRoom;
 
     }
 
     @Override
     public Room findRoomById(String roomId) throws NoSuchElementException {
         return roomRepository.findById(roomId)
-                .orElseThrow();
+                .orElseThrow(() -> new EntityNotFoundException(
+
+                        MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Комната", roomId)
+
+                ));
     }
 
     @Override
     public void deleteRoomById(String roomId) {
-        try {
-            Room deletingRoom = findRoomById(roomId);
-            roomRepository.deleteById(deletingRoom.getId());
-        } catch (NoSuchElementException exception) {
-            throw new EntityNotFoundException(
-                    MessageFormat.format(AppMessages.ENTITY_NOT_EXISTS, "Комната", roomId)
-            );
-        }
+
+        Room deletingRoom = findRoomById(roomId);
+        roomRepository.deleteById(deletingRoom.getId());
 
     }
 

@@ -1,6 +1,8 @@
-package com.example.bookingservice;
+package com.example.bookingservice.kafka;
 
 import com.example.basedomain.RoomReservationEvent;
+import com.example.bookingservice.AbstractTest;
+import com.example.bookingservice.KafkaBaseTest;
 import com.example.bookingservice.dto.reservation.request.RequestReserveRoom;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.service.KafkaMessagePublisher;
@@ -52,19 +54,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-public class KafkaTest extends AbstractTest {
+public class KafkaTest extends AbstractTest implements KafkaBaseTest {
 
     private String roomId = "73afa3b2-067a-4b68-acc1-3cfed494fe8a";
 
-    @Container
-    protected static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:7.3.3")
-    );
-
-    @DynamicPropertySource
-    static void kafkaProperties(DynamicPropertyRegistry properties) {
-        properties.add("spring.kafka.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers);
-    }
 
     private static KafkaMessageListenerContainer<String, ?> clientConsumer;
 
@@ -166,7 +159,7 @@ public class KafkaTest extends AbstractTest {
                 startDate
                 , endDate
         ))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isConflict())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityAlreadyExistsException))
                 .andExpect(result -> assertEquals("Интервал with name "+ startDate +" - "+ endDate +" already exists", result.getResolvedException().getMessage()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Интервал with name "+ startDate +" - "+ endDate +" already exists"));

@@ -32,7 +32,7 @@ public class ExceptionHandlerController {
     @ExceptionHandler(EntityAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> notFound(EntityAlreadyExistsException exception) {
         log.error("Ошибка при получении сущности {}", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(exception.getLocalizedMessage()));
     }
 

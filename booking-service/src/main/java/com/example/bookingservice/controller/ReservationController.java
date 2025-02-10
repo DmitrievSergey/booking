@@ -1,8 +1,6 @@
 package com.example.bookingservice.controller;
 
 
-import com.example.basedomain.RoomReservation;
-import com.example.basedomain.RoomReservationEvent;
 import com.example.bookingservice.aop.SendEvent;
 import com.example.bookingservice.dto.reservation.request.RequestReserveRoom;
 import com.example.bookingservice.dto.reservation.response.ResponseReservation;

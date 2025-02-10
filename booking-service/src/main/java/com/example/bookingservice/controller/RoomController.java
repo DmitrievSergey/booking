@@ -4,7 +4,6 @@ import com.example.bookingservice.dto.filter.RoomFilter;
 import com.example.bookingservice.dto.roomdto.request.CreateRoomDto;
 import com.example.bookingservice.dto.roomdto.response.ResponseDeleteRoomDto;
 import com.example.bookingservice.dto.roomdto.response.ResponseRoomDto;
-import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
 import com.example.bookingservice.mapper.RoomMapper;
 import com.example.bookingservice.model.Hotel;
@@ -13,11 +12,9 @@ import com.example.bookingservice.service.HotelService;
 import com.example.bookingservice.service.RoomService;
 import com.example.bookingservice.utils.AppMessages;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +35,7 @@ public class RoomController {
 
     @PostMapping("/add")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<ResponseRoomDto> createRoom(@PathParam("hotelId") String hotelId, @Valid @RequestBody CreateRoomDto roomDto) {
+    ResponseEntity<ResponseRoomDto> createRoom(@RequestParam("hotelId") String hotelId, @Valid @RequestBody CreateRoomDto roomDto) {
         try {
             Hotel hotel = hotelService.findHotelById(hotelId);
             Room room = roomMapper.map(roomDto, hotel);
@@ -59,7 +56,7 @@ public class RoomController {
                                                @Valid @RequestBody CreateRoomDto roomDto) {
         Room room = roomMapper.map(roomDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(
+        return ResponseEntity.ok(
                 roomMapper.map(roomService.update(roomId, room))
         );
     }
