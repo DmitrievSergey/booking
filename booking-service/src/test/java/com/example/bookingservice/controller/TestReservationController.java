@@ -111,7 +111,7 @@ public class TestReservationController extends AbstractTest implements KafkaBase
 
 
     @DisplayName("Test try to create interval with intersect with existing interval  by admin")
-    @Sql("classpath:db/createReservation.sql")
+    @Sql(value = "classpath:db/createReservation.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @ParameterizedTest()
     @CsvSource({"1977-03-01, 1977-03-05"
     , "1977-02-28, 1977-03-03"

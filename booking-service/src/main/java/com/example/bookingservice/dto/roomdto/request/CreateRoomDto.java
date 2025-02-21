@@ -29,9 +29,11 @@ public class CreateRoomDto {
     @Size(min = 1, max = 5, message = "Номер комнаты не должен быть меньше {min} символов и не должно быть больше {max} символов")
     private String number;
 
+    @NotNull
     @Positive
     private Float pricePerDay;
 
+    @NotNull
     @Min(value = 1, message = "Количество людей в комнате должно быть больше или равно {value}")
     private Byte peopleCount;
 
