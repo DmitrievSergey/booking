@@ -8,8 +8,6 @@ import com.example.bookingservice.model.Hotel;
 import com.example.bookingservice.model.Room;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
@@ -18,7 +16,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(HotelMapper.class)
-@ExtendWith(MockitoExtension.class)
 public class HotelMapperTest {
 
     private Room room;
