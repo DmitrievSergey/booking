@@ -14,7 +14,9 @@ public class ReservationInterval {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    @Column(name = "start_date")
     private LocalDate startDate;
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @ManyToOne

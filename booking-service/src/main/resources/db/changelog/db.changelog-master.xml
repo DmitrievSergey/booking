@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="1" author="Sergey">
+        <createTable tableName="hotel">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="town" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="distance" type="VARCHAR(50)" >
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createIndex indexName="hotel_name_address_town" tableName="hotel" unique="true">
+            <column name="name"/>
+            <column name="address"/>
+            <column name="town"/>
+        </createIndex>
+        <createTable tableName="users">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_name" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="roles" type="text[]" >
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="user_name" tableName="users" unique="true">
+            <column name="user_name"/>
+        </createIndex>
+        <createTable tableName="room">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="number" type="VARCHAR(5)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="FLOAT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="people_count" type="INT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="hotel_id" type="VARCHAR(255)" >
+                <constraints nullable="false" foreignKeyName="fk_room_hotel" references="hotel(id)"/>
+            </column>
+        </createTable>
+        <createIndex indexName="room_number_hotel_id" tableName="room" unique="true">
+            <column name="number"/>
+            <column name="hotel_id"/>
+        </createIndex>
+
+        <createTable tableName="reservation">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="start_date" type="date" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="date" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="room_id" type="VARCHAR(255)" >
+                <constraints nullable="false" foreignKeyName="fk_reservation_room" references="room(id)"/>
+            </column>
+            <column name="user_id" type="VARCHAR(255)" >
+                <constraints nullable="false" foreignKeyName="fk_reservation_users" references="users(id)"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+
+
+</databaseChangeLog>
