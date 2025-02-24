@@ -1,4 +1,9 @@
 version: '3'
+
+volumes:
+  cache:
+    driver: local
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:6.2.0
@@ -34,10 +39,12 @@ services:
     image: postgres:12.3
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=booking_db
+    env_file:
+      - ../booking-service/.env
+#    environment:
+#      - POSTGRES_USER = ${POSTGRES_USER}
+#      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+#      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
@@ -48,11 +55,12 @@ services:
     image: booking
     ports:
       - "8080:8080"
-    environment:
-      - HOST=postgres
+    env_file:
+      - ../booking-service/.env
     depends_on:
       - broker
       - postgres
+      - redis
 
   mongodb:
     image: mongo:6.0.8
@@ -77,3 +85,14 @@ services:
     depends_on:
       - broker
       - mongodb
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    env_file:
+      - ../booking-service/.env
+#    command: /bin/sh -c "redis-server --save 20 1 --loglevel warning --requirepass $$REDIS_PASSWORD"
+    volumes:
+      - cache:/data
