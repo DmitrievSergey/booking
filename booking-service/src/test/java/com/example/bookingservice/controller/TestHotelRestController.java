@@ -1,12 +1,15 @@
 package com.example.bookingservice.controller;
 
 import com.example.bookingservice.AbstractTest;
+import com.example.bookingservice.RedisBaseTest;
 import com.example.bookingservice.dto.hotel.request.HotelDto;
 import com.example.bookingservice.exception.EntityAlreadyExistsException;
 import com.example.bookingservice.exception.EntityNotFoundException;
+import com.example.bookingservice.model.Hotel;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -20,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Sql(scripts = "classpath:db/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-public class TestHotelRestController extends AbstractTest {
+public class TestHotelRestController extends AbstractTest implements RedisBaseTest {
     private String hotelId = "e913b22d-5d21-4998-ae8f-a258fca8913f";
     private String nonExistingHotelId = "a913b22d-5d21-4998-ae8f-a258fca8913f";
 
@@ -123,8 +126,12 @@ public class TestHotelRestController extends AbstractTest {
             , value = "Alex"
             , setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void whenDeleteHotelWithRooms_ThenOk() throws Exception {
+
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/api/v1/hotel/{id}", hotelId))
+                        .delete("/api/v1/hotel")
+                .content(objectMapper.writeValueAsString(getDeletingHotel()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Отель с Id "+ hotelId +" удален"));
     }
@@ -137,7 +144,10 @@ public class TestHotelRestController extends AbstractTest {
             , setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void whenDeleteHotelWithoutRooms_ThenOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/api/v1/hotel/{id}", hotelId))
+                        .delete("/api/v1/hotel")
+                        .content(objectMapper.writeValueAsString(getDeletingHotel()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Отель с Id "+ hotelId +" удален"));
     }
@@ -150,11 +160,14 @@ public class TestHotelRestController extends AbstractTest {
             , setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void whenDeleteNonExistingHotel_ThenException() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/api/v1/hotel/{id}", nonExistingHotelId))
+                        .delete("/api/v1/hotel")
+                        .content(objectMapper.writeValueAsString(getNonExistingHotel()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
-                .andExpect(result -> assertEquals("Отель with ID "+ nonExistingHotelId +" not exists", result.getResolvedException().getMessage()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Отель with ID "+ nonExistingHotelId +" not exists"));
+                .andExpect(result -> assertEquals("Отель with ID "+ getNonExistingHotel().getId() +" not exists", result.getResolvedException().getMessage()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Отель with ID "+ getNonExistingHotel().getId() +" not exists"));
     }
 
     @NotNull
@@ -175,6 +188,16 @@ public class TestHotelRestController extends AbstractTest {
                 , updatedTown
                 , updatedAddress
                 , "9");
+    }
+
+    @NotNull
+    private Hotel getDeletingHotel() {
+        return new Hotel("e913b22d-5d21-4998-ae8f-a258fca8913f", "First hotel", "First hotel title", "Moscow", "Tverskaja Street 1", "9", 0f, 0);
+    }
+
+    @NotNull
+    private Hotel getNonExistingHotel() {
+        return new Hotel("e913b22d-5d21-4998-ae8f-a258fca8913d", "First hotel", "First hotel title", "Moscow", "Tverskaja Street 1", "9", 0f, 0);
     }
 
     @NotNull

@@ -89,12 +89,12 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "UserService::findHotelById", key = "#hotelId"),
-            @CacheEvict(value = "HotelService::findHotelByNameAndAddressAndTown", key = "#updatingHotel.name + #updatingHotel.address + #updatingHotel.town")
+            @CacheEvict(value = "UserService::findHotelById", key = "#hotel.id"),
+            @CacheEvict(value = "HotelService::findHotelByNameAndAddressAndTown", key = "#hotel.name + #hotel.address + #hotel.town")
     })
-    public void deleteHotelById(String hotelId) {
+    public void deleteHotel(Hotel hotel) {
 
-        Hotel deletingHotel = findHotelById(hotelId);
+        Hotel deletingHotel = findHotelById(hotel.getId());
         hotelRepository.deleteById(deletingHotel.getId());
     }
 
