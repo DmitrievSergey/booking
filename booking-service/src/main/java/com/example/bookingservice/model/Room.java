@@ -5,13 +5,14 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
-public class Room {
+public class Room implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

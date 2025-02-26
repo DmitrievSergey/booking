@@ -1,17 +1,27 @@
 spring:
+  config:
+    import: optional:file:./.env[.properties]
+  cache:
+    type: redis
+    cache-names: booking-service
   jpa:
     generate-ddl: off
   datasource:
-    url: jdbc:postgresql://${HOST:localhost}/booking_db
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${HOST}/booking_db
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     hikari:
-      schema: booking_schema
+      schema: ${POSTGRES_SCHEMA}
   kafka:
       bootstrap-servers: PLAINTEXT://broker:9092
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.xml
     enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
 
 app:
   kafka:

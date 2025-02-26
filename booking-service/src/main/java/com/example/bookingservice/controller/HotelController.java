@@ -62,11 +62,11 @@ public class HotelController {
                 .stream().map(hotelMapper::mapToResponse).toList());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping()
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<ResponseDeleteRoomDto> deleteHotel(@PathVariable(name = "id") String hotelId) {
-        hotelService.deleteHotelById(hotelId);
-        return ResponseEntity.ok(new ResponseDeleteRoomDto("Отель с Id " + hotelId + " удален"));
+    ResponseEntity<ResponseDeleteRoomDto> deleteHotel(@RequestBody Hotel hotel) {
+        hotelService.deleteHotel(hotel);
+        return ResponseEntity.ok(new ResponseDeleteRoomDto("Отель с Id " + hotel.getId() + " удален"));
     }
 
     @PostMapping("/rate/{hotelId}")

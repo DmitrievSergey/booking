@@ -18,8 +18,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
@@ -35,6 +37,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.com.google.common.cache.Cache;
+
 
 import java.util.List;
 import java.util.Properties;
@@ -47,9 +51,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @Transactional
 @ActiveProfiles({"test"})
 @Testcontainers
-public abstract class AbstractTest implements PostgreBaseTest {
+public abstract class AbstractTest implements PostgreBaseTest, RedisBaseTest {
     static  {
         POSTGRE_SQL_CONTAINER.start();
+        REDIS_CONTAINER.start();
     }
 
     @Autowired
@@ -66,6 +71,9 @@ public abstract class AbstractTest implements PostgreBaseTest {
         POSTGRE_SQL_CONTAINER.withEnv("spring.datasource.url", (p) -> POSTGRE_SQL_CONTAINER.getJdbcUrl());
         POSTGRE_SQL_CONTAINER.withEnv("spring.datasource.username", (p) -> POSTGRE_SQL_CONTAINER.getUsername());
         POSTGRE_SQL_CONTAINER.withEnv("spring.datasource.password", (p) -> POSTGRE_SQL_CONTAINER.getPassword());
+
+        System.setProperty("spring.data.redis.host", REDIS_CONTAINER.getHost());
+        System.setProperty("spring.data.redis.port", REDIS_CONTAINER.getMappedPort(6379).toString());
 
     }
 

@@ -1,8 +1,8 @@
 spring:
   jpa:
-    generate-ddl: true
+    generate-ddl: off
   datasource:
-    url: jdbc:postgresql://${HOST:localhost}/booking_db
+    url: jdbc:postgresql://${HOST}/booking_db
     username: postgres
     password: postgres
     hikari:

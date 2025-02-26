@@ -26,6 +26,12 @@
             <column name="distance" type="VARCHAR(50)" >
                 <constraints nullable="true"/>
             </column>
+            <column name="rating" type="FLOAT" >
+                <constraints nullable="true"/>
+            </column>
+            <column name="number_of_rating" type="INT" >
+                <constraints nullable="true"/>
+            </column>
         </createTable>
         <createIndex indexName="hotel_name_address_town" tableName="hotel" unique="true">
             <column name="name"/>
@@ -39,7 +45,7 @@
             <column name="user_name" type="VARCHAR(50)" >
                 <constraints nullable="false"/>
             </column>
-            <column name="password" type="VARCHAR(50)" >
+            <column name="password" type="VARCHAR(255)" >
                 <constraints nullable="false"/>
             </column>
             <column name="email" type="VARCHAR(50)" >

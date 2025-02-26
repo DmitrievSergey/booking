@@ -59,6 +59,7 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> exception(Exception exception) {
+        exception.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(exception.getLocalizedMessage()));
     }

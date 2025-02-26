@@ -35,3 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
+/booking-service/test.env
+/booking-service/src/test/resources/.env

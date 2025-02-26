@@ -11,6 +11,10 @@ import com.example.bookingservice.utils.AppMessages;
 import com.example.bookingservice.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.PageRequest;
@@ -33,19 +37,22 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
 
     @Override
+    @Caching(cacheable = {
+            @Cacheable(value = "HotelService::findHotelByNameAndAddressAndTown", key = "#hotel.name + '.' + #hotel.address + '.' + #hotel.town")
+    })
     public Hotel save(Hotel hotel) {
         log.info("Зашли в save");
         return checkAndSaveTransactional(hotel);
     }
 
     @Override
+    @Caching(put = {
+            @CachePut(value = "UserService::findHotelById", key = "#updatingHotel.id"),
+            @CachePut(value = "HotelService::findHotelByNameAndAddressAndTown", key = "#updatingHotel.name + #updatingHotel.address + #updatingHotel.town")
+    })
     public Hotel update(Hotel updatingHotel) {
         lock.lock();
-        Optional<Hotel> findingHotel = hotelRepository.findByNameAndAddressAndTown(
-                updatingHotel.getName(),
-                updatingHotel.getAddress(),
-                updatingHotel.getTown()
-        );
+        Optional<Hotel> findingHotel = findHotelByNameAndAddressAndTown(updatingHotel);
         if (findingHotel.isPresent()
                 && !updatingHotel.getId().equals(findingHotel.get().getId())) {
             lock.unlock();
@@ -65,6 +72,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Cacheable(value = "UserService::findHotelById", key = "#hotelId")
     public Hotel findHotelById(String hotelId) {
         return hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -80,9 +88,13 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public void deleteHotelById(String hotelId) {
+    @Caching(evict = {
+            @CacheEvict(value = "UserService::findHotelById", key = "#hotel.id"),
+            @CacheEvict(value = "HotelService::findHotelByNameAndAddressAndTown", key = "#hotel.name + #hotel.address + #hotel.town")
+    })
+    public void deleteHotel(Hotel hotel) {
 
-        Hotel deletingHotel = findHotelById(hotelId);
+        Hotel deletingHotel = findHotelById(hotel.getId());
         hotelRepository.deleteById(deletingHotel.getId());
     }
 
@@ -121,10 +133,7 @@ public class HotelServiceImpl implements HotelService {
 
     private Hotel checkAndSave(Hotel hotel) {
         lock.lock();
-        if (hotelRepository.findByNameAndAddressAndTown(
-                hotel.getName(),
-                hotel.getAddress(),
-                hotel.getTown()).orElse(null) != null) {
+        if (findHotelByNameAndAddressAndTown(hotel).orElse(null) != null) {
             lock.unlock();
             throw new EntityAlreadyExistsException(
                     MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
@@ -138,10 +147,7 @@ public class HotelServiceImpl implements HotelService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     Hotel checkAndSaveTransactional(Hotel hotel) {
-        if (hotelRepository.findByNameAndAddressAndTown(
-                hotel.getName(),
-                hotel.getAddress(),
-                hotel.getTown()).orElse(null) != null) {
+        if (findHotelByNameAndAddressAndTown(hotel).orElse(null) != null) {
             throw new EntityAlreadyExistsException(
                     MessageFormat.format(AppMessages.ENTITY_ALREADY_EXISTS, "Отель", hotel.getName())
             );
@@ -156,5 +162,13 @@ public class HotelServiceImpl implements HotelService {
             );
         }
 
+    }
+    @Cacheable(value = "HotelService::findHotelByNameAndAddressAndTown", key = "#hotel.name + #hotel.address + #hotel.town")
+    public Optional<Hotel> findHotelByNameAndAddressAndTown(Hotel hotel) {
+        return hotelRepository.findByNameAndAddressAndTown(
+                hotel.getName(),
+                hotel.getAddress(),
+                hotel.getTown()
+        );
     }
 }
